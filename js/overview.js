@@ -104,7 +104,7 @@ $(document).ready( function(){
 			var separator = '#';
 			$('#filters :input').each(function() {
 				var i = $(this), name = i.attr("name"), val = i.val(), p = $(this).parent();
-				if ( ( name == 'filter_yr' && isCurrentYr ) || ( name == 'filter_mo' && isCurrentMo ) )
+				if ( !name || ( name == 'filter_yr' && isCurrentYr ) || ( name == 'filter_mo' && isCurrentMo ) )
 					return;
 				
 				if ( val != "0" ) {
