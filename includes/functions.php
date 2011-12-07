@@ -71,10 +71,10 @@ function format_number( $_number, $_dp=1 ) {
  */
 function is_logged_in() {
 	global $ss;
-	if( isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
+	if( isset( $_POST['simple-stats-login'] ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
 		// process login request
 		if( $_POST['username'] == $ss->options['username'] && $_POST['password'] == $ss->options['password'] ) {
-			setcookie( 'simple_stats', $ss->hash( $ss->options['username'] . $ss->options['password'] ), time() + 31536000, '/', '' );
+			@setcookie( 'simple_stats', $ss->hash( $ss->options['username'] . $ss->options['password'] ), time() + 31536000, '/', '' );
 			return true;
 		}
 	}
