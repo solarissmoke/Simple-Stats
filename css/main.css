@@ -1,0 +1,168 @@
+* {padding: 0; margin: 0 }
+footer, header, nav, section {display: block}
+
+body {
+	font: 10pt Arial;
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+h1, h2, h3, h4, #main th {
+	clear: both;
+	font: 22pt Georgia, "Times New Roman", serif;
+	padding: 10px;
+	text-align: center
+}
+
+h2 {font-size: 18pt}
+h3 {font-size: 16pt}
+h4 {font-size: 14pt; padding: 0}
+#main th {font-size: 12pt}
+
+header, footer, #main, #side {
+	border: 1px solid #CCC;
+	border-radius: 10px;
+	margin: 10px 0
+}
+
+header {
+	padding: 0 10px;
+	margin-bottom: 0;
+	text-align: left
+}
+header h1 {text-align: left}
+header a {text-decoration: none}
+
+footer {
+	clear: both;
+	padding: 10px
+}
+
+p {margin: 0.5em 0}
+a {text-decoration: none; color: #369}
+a:hover {text-decoration: none; color: #69C}
+input, select {line-height: 1.5em; padding: 5px}
+nav a {text-decoration: none; background: #F0EAF2; text-align: center; padding: 0 2px}
+nav a:hover {background: #FFF}
+
+table {border-collapse: collapse; margin: 0 auto}
+tr, td, th {border: 0.5px solid #CCC}
+th {padding: 5px; background: #EEE }
+td {padding: 3px 10px}
+tr.detail {font-size: 8pt; display: none; background: #FAFAFA}
+
+pre {
+	margin: 10px 20px;
+	padding: 5px
+}
+
+code {
+	background: #FFC;
+}
+
+#menu {float: right; margin: -40px 30px 0 0}
+#menu ul {display: inline-block; border: 1px solid #CCC; border-radius: 5px; overflow: hidden; margin: 0 0 -4px 10px}
+#menu ul li { list-style: none; display: inline-block; float: left; padding: 0}
+#menu a {min-width: 80px; padding: 5px; display: block}
+#menu a.current {font-weight: bold;  background: #FFF}
+
+#main {
+	position: relative;
+	padding: 10px 20px;
+	float: left;
+	width: 920px;
+}
+	
+#overviewpage #main {width: 750px}
+
+#side {
+	padding: 10px;
+	float: right;
+	clear: both;
+	width: 140px
+}
+
+#side h1 {
+	font-size: 14pt; margin-top: 0
+}
+#side h2 {
+	font-size: 12pt; margin-top: 10pt
+}
+
+.wide {
+	float: left;
+	border: 1px solid #CCC;
+	width: 96%;
+	margin: 10px 2%
+}
+.narrow{ 
+	border: 1px solid #CCC;
+	width: 46%;
+	float: left; 
+	margin: 10px 2%
+}
+
+.tablewrap {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border: none;
+	border-bottom: 1px solid #CCC;
+}
+
+.tablewrap table{
+	width: 100%
+}
+
+.tablewrap table tr:last-child, .tablewrap table tr:last-child td, .tablewrap table tr:last-child th {
+	border-bottom: 0
+}
+
+
+.calendar {min-width: 90%}
+.calendar td, .calendar th {padding: 2px; font-size: 0.8em}
+.calendar .selected {background: #FAA}
+#filters select {width: 120px; font-size: 9pt; line-height: 1em; padding: 2px}
+.clear-filter{ cursor: pointer; color: #900; font-weight: bold; border: 1px solid #AAA; padding: 0 2px}
+a.ajax{ cursor: pointer }
+
+#wrap .center {text-align: center}
+#wrap .left {text-align: left}
+#wrap .right {text-align: right}
+
+#chartopt {
+	clear: both;
+	width: 96%;
+	font-size: 10pt;
+	text-align: right;
+	margin-bottom: 10px
+}
+
+#chartopt a.current{
+	text-decoration: underline
+}
+
+.toggle {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	vertical-align: middle;
+	text-indent: -1000px;
+	border-color: #FFF #FFF #FFF #000;
+	border-style: solid;
+	border-width: 5px;
+}
+
+#paths tbody td {
+	border: 1px solid #EEE;
+}
+
+#paths tbody td, #paths th{
+	border-left: none;
+	border-right: none;
+}
+
+#paths .visit-header {
+	background: #FAFAFA;
+	color: #999
+}
