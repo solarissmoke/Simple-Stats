@@ -31,6 +31,8 @@ function display_filters(){
 		foreach( array( 'search_terms', 'domain', 'referrer' ) as $f )
 			filter_select( $f );
 	}
+	
+	echo '<input class="hide-if-js" type="submit" value="' . __( 'Apply filters' ) . '">';
 
 	echo '</form></div>';
 	echo '</nav>';
@@ -98,7 +100,7 @@ function filter_select( $id ) {
 		return;
 	
 	$active = isset( $filters[$id] );
-	$box = $active ? '<a class="clear-filter">&#215;</a> ' : '';
+	$box = $active ? '<a class="clear-filter hide-if-no-js">&#215;</a> ' : '';
 	echo "<p>$box<select name='filter_$id'>";
 	echo "<option value='0' class='first'>— $title</option>";
 	
@@ -322,9 +324,11 @@ function chart( $what = 'days' ) {
 	$vtitle = htmlspecialchars( __( 'Visits' ) . '/' . $per );
 	$htitle = htmlspecialchars( __( 'Hits' ) . '/' . $per );
 	
+	echo '<div class="hide-if-no-js">';
 	echo '<h4 id="chart-title">' . $vtitle . '</h4>';
 	echo '<div class="wide" id="chart" style="height: 180px; border:none"></div>';
 	echo '<div id="chartopt"><small>' . __( 'Show:' ) . ' <a class="ajax" data:show="h">' . __( 'hits' ) . '</a> | <a class="ajax current" data:show="v">' . __( 'visits' ) . '</a></small></div>';
+	echo '</div>';
 	
 	// send the data as a hidden table which we'll parse using JS
 	echo "<table id='chart-data' style='display:none' data:vtitle='$vtitle' data:htitle='$htitle'>";

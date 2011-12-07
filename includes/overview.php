@@ -21,11 +21,11 @@ $field_names = array(
 $filters = array();
 $has_filters = false;
 foreach ( $time_fields as $key ) {
-	if ( isset( $_GET["filter_$key"] ) )
+	if ( isset( $_GET["filter_$key"] ) && $_GET["filter_$key"] != '0' )
 		$filters[$key] = $_GET['filter_'.$key];
 }
 foreach ( array_keys( $field_names ) as $key ) {
-	if ( isset( $_GET["filter_$key"] ) ) {
+	if ( isset( $_GET["filter_$key"] ) && $_GET["filter_$key"] != '0' ) {
 		$has_filters = true;
 		$filters[$key] = $_GET["filter_$key"];
 	}

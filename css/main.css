@@ -123,7 +123,8 @@ code {
 .calendar td, .calendar th {padding: 2px; font-size: 0.8em}
 .calendar .selected {background: #FAA}
 #filters select {width: 120px; font-size: 9pt; line-height: 1em; padding: 2px}
-.clear-filter{ cursor: pointer; color: #900; font-weight: bold; border: 1px solid #AAA; padding: 0 2px}
+.clear-filter{cursor: pointer; color: #900; font-weight: bold; border: 1px solid #AAA; padding: 0 2px}
+.hide-if-no-js {display: none}
 a.ajax{ cursor: pointer }
 
 #wrap .center {text-align: center}

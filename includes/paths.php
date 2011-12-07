@@ -83,13 +83,14 @@ function render_page() {
 	}
 
 	echo '</table>';
-	echo '<nav class="center wide"><a class="ajax" style="display:block; padding: 5px" id="load-more">— ' . __( 'more' ) . ' —</a></nav>';
+	echo '<nav class="center wide hide-if-no-js"><a class="ajax" style="display:block; padding: 5px" id="load-more">— ' . __( 'more' ) . ' —</a></nav>';
 
 	echo '</div>';
 
 	?>
 	<script>
 	$(document).ready( function(){
+		$(".hide-if-no-js").show();
 		var offset = <?php echo $offset; ?>;
 		var loading = false;
 		var lm = $("#load-more"), text = lm.text();

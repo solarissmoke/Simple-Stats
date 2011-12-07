@@ -25,6 +25,10 @@ $(document).ready( function(){
 	}
 	
 	function overviewRefresh() {
+		// js/no-js
+		$(".hide-if-js").hide();
+		$(".hide-if-no-js").show();
+		
 		// toggle links
 		$('a.toggle').click( function(e) {
 			e.preventDefault();
