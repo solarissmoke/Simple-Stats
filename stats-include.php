@@ -51,7 +51,7 @@ class SimpleStatsHit {
 		$data['version']  = mb_substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
 		
 		// check whether to ignore this hit
-		if ( $data['browser'] == 'Crawler' && $ss->options['log_crawlers'] == false )
+		if ( $data['browser'] == 'Crawler' && $ss->options['log_bots'] == false )
 			return;
 		
 		$t = time();
