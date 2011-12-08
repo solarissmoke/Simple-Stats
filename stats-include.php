@@ -146,7 +146,8 @@ class SimpleStatsHit {
 	 */
 	function _determine_country( $_ip ) {
 		if ( SimpleStats::is_geoip() ) {
-			include_once( SIMPLE_STATS_PATH.'/geoip/geoip.php' );
+			if( ! function_exists( 'geoip_open' ) && ! class_exists( 'GeoIP' ) )		// it's possible the user has another instance running
+				include_once( SIMPLE_STATS_PATH.'/geoip/geoip.php' );
 			$gi = geoip_open( SIMPLE_STATS_PATH.'/geoip/GeoIP.dat', GEOIP_STANDARD );
 			return geoip_country_code_by_addr( $gi, $_ip );
 			geoip_close( $gi );
