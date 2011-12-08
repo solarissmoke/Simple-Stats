@@ -1,7 +1,7 @@
 <?php
 class SimpleStats {
 	private $connection;
-	private $debug = true;
+	private $debug = false;
 	private $installed = false;
 	public $tables = array();
 	public $options = array();

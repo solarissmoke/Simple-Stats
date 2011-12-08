@@ -17,3 +17,8 @@ This program incorporates work from:
 	SlimStat; (c) 2010 Pieces & Bits Limited; http://slimstat.net; which is licensed under the GNU General Public License, version 2
 
 Wherever third party code has been used, credit has been given in the code's comments.
+
+System requirements:
+
+* PHP v5.2.4 or greater, with mbstring extension
+* MySQL v5.0 or greater

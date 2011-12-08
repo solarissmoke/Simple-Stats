@@ -12,23 +12,23 @@ class SimpleStatsHit {
 			return;
 		
 		$data = array();
-		$data['remote_ip'] = mb_substr( $this->_determine_remote_ip(), 0, 15 );
+		$data['remote_ip'] = substr( $this->_determine_remote_ip(), 0, 15 );
 		// check whether to ignore this hit
 		foreach ( $ss->options['ignored_ips'] as $ip ) {
-			if ( mb_strpos( $data['remote_ip'], $ip ) === 0 )
+			if ( strpos( $data['remote_ip'], $ip ) === 0 )
 				return;
 		}
 		
 		$data['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
 		$url = parse_url( $data['referrer'] );
-		$data['referrer'] = mb_substr( $ss->utf8_encode( $data['referrer'] ), 0, 255 );
+		$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 255 );
 		
 		$data['country']  = $this->_determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
-		$data['language'] = mb_substr( SimpleStats::determine_language(), 0, 255 );
-		$data['domain']   = isset( $url['host'] ) ? mb_eregi_replace( '^www.', '', $url['host'] ) : '';
-		$data['domain']   = mb_substr( $data['domain'], 0, 255 );
+		$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );
+		$data['domain']   = isset( $url['host'] ) ? preg_replace( '/^www\./', '', $url['host'] ) : '';
+		$data['domain']   = substr( $data['domain'], 0, 255 );
 		
-		$data['search_terms'] = mb_substr( $ss->utf8_encode( $this->_determine_search_terms( $url ) ), 0, 255 );
+		$data['search_terms'] = substr( $ss->utf8_encode( $this->_determine_search_terms( $url ) ), 0, 255 );
 
 		if ( isset( $_SERVER['REQUEST_URI'] ) )
 			$data['resource'] = $_SERVER['REQUEST_URI'];
@@ -43,12 +43,12 @@ class SimpleStatsHit {
 		else
 			$data['resource'] = '';
 
-		$data['resource'] = mb_substr( $ss->utf8_encode( $data['resource'] ), 0, 255 );
+		$data['resource'] = substr( $ss->utf8_encode( $data['resource'] ), 0, 255 );
 		
 		$browser = $this->_parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
-		$data['platform'] = mb_substr( $browser['platform'], 0, 50 );
-		$data['browser']  = mb_substr( $browser['browser'], 0, 50 );
-		$data['version']  = mb_substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
+		$data['platform'] = substr( $browser['platform'], 0, 50 );
+		$data['browser']  = substr( $browser['browser'], 0, 50 );
+		$data['version']  = substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
 		
 		// check whether to ignore this hit
 		if ( $data['browser'] == 'Crawler' && $ss->options['log_bots'] == false )
@@ -70,16 +70,16 @@ class SimpleStatsHit {
 		if ( sizeof( $domain_array ) > 2 )
 			return;
 		
-		if ( mb_strlen( $data['domain'] ) >= 25 &&
+		if ( strlen( $data['domain'] ) >= 25 &&
 		     ( !isset( $_SERVER['SERVER_NAME'] ) ||
-		       $data['domain'] != mb_eregi_replace( '^www.', '', $_SERVER['SERVER_NAME'] ) ) )
+		       $data['domain'] != preg_replace( '/^www\./', '', $_SERVER['SERVER_NAME'] ) ) )
 			return;
 		
 		// attempt to update table
 		$table = $ss->tables['visits'];
 		
 		if ( $ss->options['log_user_agents'] )
-			$data['user_agent'] = $ss->esc( mb_substr( $_SERVER['HTTP_USER_AGENT'], 0, 255 ) );
+			$data['user_agent'] = $ss->esc( substr( $_SERVER['HTTP_USER_AGENT'], 0, 255 ) );
 		
 		$resource = $ss->esc( $time . ' ' .$data['resource'] );
 		$ip = $ss->esc( $data['remote_ip'] );

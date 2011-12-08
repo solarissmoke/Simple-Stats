@@ -258,7 +258,7 @@ function table_percent( $id, $format = 'narrow') {
 		
 		echo '<tr><td>';
 		if ( $id == 'browser'  ) {
-			echo '<a class="toggle" title="" id="browser_'.preg_replace( '/[^a-z]/', '', mb_strtolower( $key ) );
+			echo '<a class="toggle" title="" id="browser_'.preg_replace( '/[^a-z]/', '', strtolower( $key ) );
 			echo '" href="#">+</a> ';
 		}
 		
@@ -274,7 +274,7 @@ function table_percent( $id, $format = 'narrow') {
 		if ( $id == 'browser' && $key != '' && ( isset( $loaded_data['visits']['version'][$key] ) ) ) {
 			foreach ( $loaded_data['visits']['version'][$key] as $key2 => $hits2 ) {
 				$pct = ( $total > 0 ) ? $hits2 / $total * 100 : 0;
-				echo '<tr class="detail detail_browser_'.preg_replace( '/[^a-z]/', '', mb_strtolower( $key ) ).'">';
+				echo '<tr class="detail detail_browser_'.preg_replace( '/[^a-z]/', '', strtolower( $key ) ).'">';
 				echo '<td>' . htmlspecialchars( $key2 );
 				echo '<td class="center">'.format_number( $pct );
 				echo '</tr>';
@@ -403,7 +403,7 @@ function calendar_widget() {
 	echo '<tr>';
 	foreach ( array( __( 'Sunday' ), __( 'Monday' ), __( 'Tuesday' ), __( 'Wednesday' ), __( 'Thursday' ), __( 'Friday' ), __( 'Saturday' ) ) as $day ) {
 		$day = htmlspecialchars( $day );
-		$d = mb_substr( $day, 0, 1 );
+		$d = substr( $day, 0, 1 );
 		echo "<th title='$day'>$d</th>";
 	}
 	

@@ -12,11 +12,12 @@ function page_foot() {
 
 function filter_link( $_filters, $text ) {
 	global $is_archive;
-	$text = htmlspecialchars( $text );
 	
 	// avoid super-long referrer strings
 	if( strlen( $text ) > 100 )
-		$text = mb_substr( $text, 0, 100 ) . '&hellip;';
+		$text = substr( $text, 0, 100 ) . '&hellip;';
+	
+	$text = htmlspecialchars( $text );
 	
 	// cannot filter archives
 	if( $is_archive )
@@ -95,12 +96,6 @@ function logout() {
 
 function sp2nb( $_str ) {
 	return str_replace( ' ', '&nbsp;', $_str );
-}
-
-function is_filtered( $field ) {
-	global $filters;
-	return isset( $filters[$field] );
-	// helper function to determine if a filter is active
 }
 
 /* i18n - needs work */
