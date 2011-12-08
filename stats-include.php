@@ -311,12 +311,12 @@ class SimpleStatsHit {
 		if ( !$browser ) {
 			if ( strpos( $_ua, 'Mozilla/4' ) !== false && stripos( $_ua, 'compatible' ) === false ) {
 				$browser = 'Netscape';
-				preg_match( 'Mozilla/([\d\.]+)', $_ua, $b );
+				preg_match( '/Mozilla/([\d\.]+)/', $_ua, $b );
 				$version = $b[1];
 			} elseif ( ( strpos( $_ua, 'Mozilla/5' ) !== false && stripos( $_ua, 'compatible' ) === false ) || strpos( $_ua, 'Gecko' ) !== false ) {
 				$browser = 'Mozilla';
-				preg_match( 'rv(:| )([\d\.]+)', $_ua, $b );
-				$version = $b[2];
+				preg_match( '/rv:([\d\.]+)/', $_ua, $b );
+				$version = $b[1];
 			}
 		}
 		
