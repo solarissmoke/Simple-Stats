@@ -1,7 +1,7 @@
 <?php
 $ajax = ( isset( $_REQUEST['ajax'] ) && $_REQUEST['ajax'] == 1 );
 $is_archive = false;
-$time_fields = array( 'yr', 'mo', 'dy' );
+
 $field_names = array(
 	'remote_ip' => __( 'IP addresses' ),
 	'search_terms' => __( 'Search terms' ),
@@ -20,10 +20,15 @@ $field_names = array(
 // set up filters
 $filters = array();
 $has_filters = false;
-foreach ( $time_fields as $key ) {
-	if ( isset( $_GET["filter_$key"] ) && $_GET["filter_$key"] != '0' )
-		$filters[$key] = $_GET['filter_'.$key];
+if ( isset( $_GET['filter_date'] ) && $_GET['filter_date'] != '0' ) {
+	// parse pretty dates of the form yyyy/mm[/dd]
+	preg_match( '|(\d{4})-(\d{1,2})(?:-(\d{1,2}))?|', $_GET['filter_date'], $dates );
+	$filters['yr'] = $dates[1];
+	$filters['mo'] = $dates[2];
+	if( isset( $dates[3] ) )
+		$filters['dy'] = $dates[3];
 }
+
 foreach ( array_keys( $field_names ) as $key ) {
 	if ( isset( $_GET["filter_$key"] ) && $_GET["filter_$key"] != '0' ) {
 		$has_filters = true;

@@ -39,11 +39,11 @@ if( !$ss->is_installed() ) {
 
 date_default_timezone_set( $ss->options['tz'] );
 
-if ( $ss->options['login_required'] ) {
+if ( $page == 'logout' || needs_authentication() ) {
 	if ( $page == 'logout' )
 		logout();
 	if ( $page != 'login' && !is_logged_in() )
-		request_login();
+		request_login( $page );
 }
 
 require_once( SIMPLE_STATS_PATH.'/includes/'.$page.'.php' );

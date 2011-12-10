@@ -24,10 +24,20 @@ function filter_link( $_filters, $text ) {
 		return $text;
 	
 	$url = filter_url( $_filters );
-	return "<a href='./$url' title='$text'>$text</a>";
+	return "<a href='./$url' title='" . __( 'Filter results for this item' ) . "'>$text</a>";
 }
 
-function filter_url( $_filters, $_first_separator='?' ) {
+function get_date_filter( $yr, $mo, $dy = false ) {
+	$mo = sprintf( '%02d', $mo );
+	$dy = $dy ? sprintf( '%02d', $dy ) : '';
+	
+	if( !$dy && $yr == date('Y') && $mo == date('m') )
+		return '0';
+	
+	return "$yr-$mo" . ( $dy ? "-$dy" : '' );
+}
+
+function filter_url( $_filters ) {
 	if ( !is_array( $_filters ) )
 		return '';
 	
@@ -35,26 +45,25 @@ function filter_url( $_filters, $_first_separator='?' ) {
 	$str = '';
 	$cleaned_filters = $_filters;
 	
-	if ( isset( $_filters['yr'] ) && $_filters['yr'] == date( 'Y' ) ) {
-		unset( $cleaned_filters['yr'] );
-		if ( isset( $_filters['mo'] ) && $_filters['mo'] == date( 'n' ) )
-			unset( $cleaned_filters['mo'] );
-	}
+	unset( $cleaned_filters['yr'], $cleaned_filters['mo'], $cleaned_filters['dy'] );
 	
+	$yr = isset( $_filters['yr'] ) ?  $_filters['yr'] : date('Y'); 
+	$mo = isset( $_filters['mo'] ) ?  $_filters['mo'] : date('m');
+	$dy = isset( $_filters['dy'] ) ? $_filters['dy'] : false;
+	$date =  get_date_filter( $yr, $mo, $dy );
+	if( $date )
+		$cleaned_filters['date'] = $date;
+	
+	$sep = '?';
 	foreach ( $cleaned_filters as $key => $value ) {
-		if ( $shown_first ) {
-			$str .= '&amp;';
-		} else {
-			$str .= $_first_separator;
-			$shown_first = true;
-		}
-		$str .= 'filter_'. $key .'='.rawurlencode( $value );
+		$str .= $sep . 'filter_'. $key . '=' . rawurlencode( $value );
+		$sep = '&amp;';
 	}
 	
 	return $str;
 }
 
-function format_number( $_number, $_dp=1 ) {
+function format_number( $_number, $_dp = 1 ) {
 	$decimal = __( '.', 'decimal_point' );
 	$thousands = __( 'core', 'thousands_separator' );
 	$str = number_format( $_number, $_dp, $decimal, $thousands );
@@ -67,31 +76,26 @@ function format_number( $_number, $_dp=1 ) {
 	return $str;
 }
 
-/**
- * Detects whether a user is logged in
- */
+function needs_authentication() {
+	global $ss, $page;
+	if( $ss->options['login_required'] == 'all' || ( $page == 'options' && $ss->options['login_required'] == 'config' ) )
+		return true;
+	return false;
+}
+
 function is_logged_in() {
 	global $ss;
-	if( isset( $_POST['simple-stats-login'] ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
-		// process login request
-		if( $_POST['username'] == $ss->options['username'] && $_POST['password'] == $ss->options['password'] ) {
-			@setcookie( 'simple_stats', $ss->hash( $ss->options['username'] . $ss->options['password'] ), time() + 31536000, '/', '' );
-			return true;
-		}
-	}
-
 	return ( isset( $_COOKIE['simple_stats'] ) && $_COOKIE['simple_stats'] == $ss->hash( $ss->options['username'] . $ss->options['password'] ) );
 }
 
-function request_login() {
-	header( 'Status: 302 Moved Temporarily' );
-	header( 'Location: ./?p=login' );
+function request_login( $origin = false ) {
+	header( 'Location: ./?p=login' . ( $origin ? '&origin=' . $origin : '' ), true, 302 );
 	exit;
 }
 
 function logout() {
 	setcookie( 'simple_stats', '', time() + 31536000, '/', '' );
-	request_login();
+	request_login( 'logout' );
 }
 
 function sp2nb( $_str ) {

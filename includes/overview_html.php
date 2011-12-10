@@ -14,17 +14,15 @@ function display_filters(){
 	calendar_widget();
 
 	echo '<div id="filters" class="center"><form>';
-	// time fields
-	echo '<input type="hidden" id="filter_yr" name="filter_yr" value="' . $filters['yr'] . '">';
-	echo '<input type="hidden" id="filter_mo" name="filter_mo" value="' . $filters['mo'] . '">';
-	echo '<input type="hidden" id="filter_dy" name="filter_dy" value="' . ( isset( $filters['dy'] ) ? $filters['dy'] : '0' ) . '">';
+	echo '<input type="hidden" id="filter_date" name="filter_date" value="' . get_date_filter( $filters['yr'], $filters['mo'], isset( $filters['dy'] ) ? $filters['dy'] : false ) . '">';
+
 		
-	if( !$is_archive && !empty( $loaded_data['pages'] ) ) {
+	if( !$is_archive ) {
 		echo '<h2>' . __( 'Content' ) . '</h2>';
 		filter_select( 'resource' );
 
 		echo '<h2>' . __( 'Visitors' ) . '</h2>';
-		foreach( array( 'remote_ip', 'browser', 'platform', 'resolution', 'country', 'language' ) as $f )
+		foreach( array( 'remote_ip', 'browser', 'platform', 'country', 'language' ) as $f )
 			filter_select( $f );
 
 		echo '<h2>' . __( 'Referrers' ) . '</h2>';
@@ -39,7 +37,7 @@ function display_filters(){
 }
 
 function display_content(){
-	global $date_label, $filters, $ss, $loaded_data, $is_archive;
+	global $date_label, $filters, $ss, $loaded_data, $is_archive, $field_names;
 	
 	echo '<div id="main">';
 	$date_label = htmlspecialchars( date_label( $filters ) );
@@ -65,7 +63,6 @@ function display_content(){
 		table_total( 'remote_ip' );
 		table_percent( 'browser' );
 		table_percent( 'platform' );
-		//table_percent( 'resolution' );
 
 		if ( SimpleStats::is_geoip() )
 			table_percent( 'country' );
@@ -81,7 +78,7 @@ function display_content(){
 	
 	}
 	else {
-		echo '<p class="center">' . __( 'There is no data available for the preiod you have selected.' );
+		echo '<p class="center">' . __( 'There is no data available for the date/filters you have selected.' );
 	}
 	echo '</div>';
 }
@@ -96,8 +93,7 @@ function filter_select( $id ) {
 	else
 		$data = &$loaded_data['visits'][$id];
 	
-	if( empty( $data ) )
-		return;
+	$data = (array) $data;
 	
 	$active = isset( $filters[$id] );
 	$box = $active ? '<a class="clear-filter hide-if-no-js">&#215;</a> ' : '';
@@ -155,23 +151,23 @@ function filter_select( $id ) {
 }
 
 function table_summary() {
-	global $filters, $loaded_data, $date_label;
+	global $loaded_data;
 	
 	// show empty summary if we have no data for this period
 	if( empty( $loaded_data['pages'] ) ) {
-		$hits = $visits = $ips = 0;
+		$hits = $visits = $ips = '0';
 	}
 	else {
-		$hits = array_sum( $loaded_data['pages'] );	// total page hits
-		$visits = array_sum( $loaded_data['visits']['remote_ip'] );
-		$ips = sizeof( $loaded_data['visits']['remote_ip'] );
+		$hits = format_number( array_sum( $loaded_data['pages'] ), 0 );	// total page hits
+		$visits = format_number( array_sum( $loaded_data['visits']['remote_ip'] ), 0 );
+		$ips = format_number( sizeof( $loaded_data['visits']['remote_ip'] ), 0 );
 	}
 	
 	echo '<table class="wide center"><thead><tr><th colspan="3">Summary<tbody><tr>';
-	echo '<td width="33%" title="'.$date_label.'">'.format_number( $hits, 0 ).' <span class="text">' . __( 'Hits' ) . '</span></td>';
-	echo '<td width="33%" title="'.$date_label.'">'.format_number( $visits, 0 ).' <span class="text">' . __( 'Visits' ) . '</span></td>';
-	echo '<td width="33%" title="'.$date_label.'">'.format_number( $ips, 0 ).' <span class="text">' . __( 'Unique IPs' ) . '</span></td>';
-	echo '</tbody></table>';
+	echo "<td width='33%'>$hits " . __( 'Hits' );
+	echo "<td width='33%'>$visits " . __( 'Visits' );
+	echo "<td width='33%'>$ips " . __( 'Unique IPs' );
+	echo '</table>';
 }
 
 function table_total( $id, $format = 'narrow' ) {
@@ -210,11 +206,11 @@ function table_total( $id, $format = 'narrow' ) {
 		
 		echo '<tr><td>';
 		if ( $id == 'referrer' ) {
-			echo '<a class="external" title="'.htmlspecialchars( $key ).'" href="'.htmlspecialchars( $key ).'" rel="nofollow">&rarr;</a> ';
+			echo '<a class="goto" title="' . __('Visit this referrer page') . '" href="' . htmlspecialchars( $key ) . '" rel="external nofollow noreferrer">&rarr;</a> ';
 		}
 
 		echo filter_link( $new_filters, $key );
-		echo "<td class='center' title='$date_label'>".format_number( $hits, 0 ).'</td>';
+		echo "<td class='center' title='$date_label'>".format_number( $hits, 0 );
 		
 		$pos++;
 		if ( $pos >= $max_rows ) 
@@ -269,7 +265,7 @@ function table_percent( $id, $format = 'narrow') {
 		
 		echo filter_link( $new_filters, ( $key == '' ) ? __( 'Unknown' ) : $label );
 		
-		echo '<td class="center" title="'.$date_label.'">'.format_number( $pct ).'</td>';
+		echo '<td class="center" title="'.$date_label.'">'.format_number( $pct );
 			
 		if ( $id == 'browser' && $key != '' && ( isset( $loaded_data['visits']['version'][$key] ) ) ) {
 			foreach ( $loaded_data['visits']['version'][$key] as $key2 => $hits2 ) {
@@ -277,7 +273,6 @@ function table_percent( $id, $format = 'narrow') {
 				echo '<tr class="detail detail_browser_'.preg_replace( '/[^a-z]/', '', strtolower( $key ) ).'">';
 				echo '<td>' . htmlspecialchars( $key2 );
 				echo '<td class="center">'.format_number( $pct );
-				echo '</tr>';
 			}
 		}
 		
@@ -390,9 +385,9 @@ function calendar_widget() {
 	
 	echo '<table class="calendar center"><thead>';
 	echo '<tr>';
-	echo "<th>$prev_link</th>";
-	echo '<th colspan="5"><a class="thismonth" href="./' . filter_url( next_period( $prev ) ) . '" title="' . date_label( $filters, false ).'">' . date_label( $filters, false ) . '</a></th>';
-	echo "<th>$next_link</th>";
+	echo "<th>$prev_link";
+	echo '<th colspan="5"><a class="thismonth" href="./' . filter_url( next_period( $prev ) ) . '" title="' . date_label( $filters, false ).'">' . date_label( $filters, false ) . '</a>';
+	echo "<th>$next_link";
 	
 	if( $is_archive ) {
 		echo '</table>';
@@ -404,7 +399,7 @@ function calendar_widget() {
 	foreach ( array( __( 'Sunday' ), __( 'Monday' ), __( 'Tuesday' ), __( 'Wednesday' ), __( 'Thursday' ), __( 'Friday' ), __( 'Saturday' ) ) as $day ) {
 		$day = htmlspecialchars( $day );
 		$d = substr( $day, 0, 1 );
-		echo "<th title='$day'>$d</th>";
+		echo "<th title='$day'>$d";
 	}
 	
 	$actual_dy = intval( date( 'd' ) );
@@ -424,7 +419,7 @@ function calendar_widget() {
 
 			if ( $table[$w][$d] > 0 ) {
 				if ( $filters['yr'] == $actual_yr && $filters['mo'] == $actual_mo && $table[$w][$d] > $actual_dy ) {
-					echo $table[$w][$d];
+					echo '<a class="future">' . $table[$w][$d] . '</a>';
 				} else {
 					$dy_filters['dy'] = $table[$w][$d];
 					echo '<a href="./'.filter_url( $dy_filters ).'" title="';

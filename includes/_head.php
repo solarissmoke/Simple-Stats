@@ -6,6 +6,7 @@ $title = htmlspecialchars( $title );
 <!DOCTYPE html><html>
 <head>
 	<?php if( ! $ajax ) { ?>
+		<meta name="robots" content="noindex,nofollow">
 		<title><?php echo $title;?></title><link rel="stylesheet" href="css/main.css">
 		<!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->
 		<script src="js/jquery.js"></script>
@@ -26,10 +27,10 @@ if( !$ajax ) {
 	echo "<header><h1><a href='./'>$title</a></h1>";
 	if( $ss->is_installed() ) {
 		echo '<nav id="menu"><ul>';
-		if ( $ss->options['login_required'] && is_logged_in() )
+		if ( is_logged_in() )
 			echo '<li><a href="?p=logout">Logout</a></li>';
 
-		if( ! $ss->options['login_required'] || is_logged_in() ) {
+		if( $ss->options['login_required'] != 'all' || is_logged_in() ) {
 			echo '<li><a href="./" ' . ( $page == 'overview' ? 'class="current"' : '' ) . '>' . __( 'Overview' ) . '</a>';
 			echo '<li><a href="./?p=paths" ' . ( $page == 'paths' ? 'class="current"' : '' ) . '>' . __( 'Latest visits' ) . '</a>';
 			echo '<li><a href="./?p=options" ' . ( $page == 'options' ? 'class="current"' : '' ) . '>' . __( 'Configuration' ) . '</a>';

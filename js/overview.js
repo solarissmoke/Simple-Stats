@@ -44,67 +44,21 @@ $(document).ready( function(){
 				$('tr.detail_'+id).toggle();
 		});
 		
-		// handle calendar month links being clicked
-		$('table.calendar thead a').click(function(e) {
+		// filter links
+		$('#main a[href^="./?filter_"], table.calendar a').click(function(e) {
 			e.preventDefault();
-			var value = $(this).attr('href');
-			value = (value.indexOf('?') > -1) ? value.substr(value.indexOf('?') + 1) : '';
-			
-			var changedYr = false;
-			var changedMo = false;
-			var vars = value.split('&');
-			for (var i = 0; i < vars.length; i++) {
-				var param = vars[i].split('=');
-				if (param[0] == 'filter_yr') {
-					$("#filter_yr").val( param[1] );
-					changedYr = true;
-				} else if (param[0] == 'filter_mo') {
-					$("#filter_mo").val(param[1]);
-					changedMo = true;
-				}
-			}
-			
-			var currentDate = new Date();
-			if (!changedYr)
-				$("#filter_yr").val(currentDate.getFullYear());
-
-			if (!changedMo)
-				$("#filter_mo").val(currentDate.getMonth() + 1);
-			
-			$("#filter_dy").val("0").change();
-		});
-		
-		// calendar day links
-		$('table.calendar tbody a').click( function(e) {
-			e.preventDefault();
-			$('input[name="filter_dy"]').val( $(this).text() ).change();
-		});
-		
-		// handle details page links being clicked
-		$('#main a[href^="./?filter_"]').click(function(e) {
-			e.preventDefault();
-			var a = $(this);
-			var filter = a.attr("href").replace("./?", "" ).split("=");
-			
-			if( filter.length != 2 )
-				return;	// something went wrong
-
-			activateFilter( decodeURIComponent( filter[0] ), decodeURIComponent( filter[1] ) );
+			location.hash = $(this).attr("href").replace(/\.\/\??/, "" );
 		});
 		
 		// handle filters changing
 		$('#filters :input').change( function() {
-			var currentDate = new Date();
-			var isCurrentYr = ( $("#filter_yr").val() == currentDate.getFullYear() );
-			var isCurrentMo = isCurrentYr && ( $("#filter_mo").val() == currentDate.getMonth() + 1 );
-			
 			$("#filters .clear-filter").remove();	// remove old x's
 			
 			var hash = '';
 			var separator = '#';
 			$('#filters :input').each(function() {
 				var i = $(this), name = i.attr("name"), val = i.val(), p = $(this).parent();
-				if ( !name || ( name == 'filter_yr' && isCurrentYr ) || ( name == 'filter_mo' && isCurrentMo ) )
+				if ( !name )
 					return;
 				
 				if ( val != "0" ) {
@@ -118,6 +72,7 @@ $(document).ready( function(){
 			
 			location.hash = hash;
 		});
+		
 		// make the filter section pretty
 		var s = $("#side").css("padding-bottom", "10px"), m = $("#main"), diff = m.innerHeight() - s.innerHeight();
 		if( diff )
@@ -169,7 +124,7 @@ $(document).ready( function(){
 				$(this).addClass("current");
 			});
 			
-			previousPoint = null;
+			var previousPoint = null;
 			$("#chart").bind("plothover", function (event, pos, item) {
 				if (item) {
 					if (previousPoint != item.dataIndex) {

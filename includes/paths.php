@@ -46,7 +46,7 @@ function render_page() {
 			echo '<tr class="visit-header"><td colspan="6" class="left"><small>' . htmlspecialchars( $visit['user_agent'] ) . '</small>';
 		}
 		
-		$prev_time = '';
+		$row = 0;
 		foreach ( $hits as $hit ) {
 			if ( empty( $hit ) )
 				continue;
@@ -59,26 +59,21 @@ function render_page() {
 			$r = htmlspecialchars( $resource );
 			
 			echo '<tr>';
-			echo "<td colspan='2' class='left'><span><a href='$r' title='$r' class='goto' target='_blank'>&rarr;</a> " . filter_link( array( 'resource' => $resource ), $resource ) . "</span>";
-
-			echo ( $time != $prev_time ) ? "<td>$time</td>" : '<td></td>';
+			echo '<td colspan="2" class="left"><a href="' . $r . '" title="' . __( 'Visit this page' ) . '" class="goto">&rarr;</a> ' . filter_link( array( 'resource' => $resource ), $resource ) . "<td>$time";
 			
-			if ( empty( $prev_time ) && ! empty( $visit['referrer'] ) ) {
-				$r = htmlspecialchars( $visit['referrer'] );
-				echo '<td colspan="3" class="right"><a href="'.$r.'" rel="nofollow" class="goto" title="'.$r.'">&rarr;</a> ';
-				echo '<span>';
-				if ( !empty( $visit['search_terms'] ) ) {
+			if ( $row == 0 && ! empty( $visit['referrer'] ) ) {
+				echo '<td colspan="3" class="right">';
+				if ( !empty( $visit['search_terms'] ) )
 					echo filter_link( array( 'search_terms' => $visit['search_terms'] ), $visit['search_terms'] );
-				} else {
+				else
 					echo filter_link( array( 'domain' => $visit['domain'] ), $visit['domain'] );
-				}
-				echo '</span></td>';
+				echo ' <a href="' . htmlspecialchars( $visit['referrer'] ) . '" rel="external nofollow noreferrer" class="goto" title="' . __( 'Visit this referrer page' ) .'">&rarr;</a>';
 			} else {
-				echo '<td colspan="3">&nbsp;</td>';
+				echo '<td colspan="3">&nbsp;';
 			}
 			echo '</tr>';
 			
-			$prev_time = $time;
+			$row ++;
 		}
 	}
 

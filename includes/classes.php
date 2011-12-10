@@ -6,6 +6,8 @@ class SimpleStats {
 	public $tables = array();
 	public $options = array();
 	public $tz;
+	const version = '1.0.1';
+	const db_version = 1;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -17,6 +19,10 @@ class SimpleStats {
 		
 		$this->connect();
 		$this->options = $this->load_options();
+		
+		// upgrade check
+		if( $this->installed && ( !isset( $this->options['db_version'] ) || $this->options['db_version'] < self::db_version ) )
+			$this->setup_options();
 	}
 	
 	function is_installed() {
@@ -49,7 +55,7 @@ class SimpleStats {
 			$options[$row['option']] = unserialize( $row['value'] );
 		}
 		
-		$this->installed = isset( $options['version'] );	// first run?
+		$this->installed = isset( $options['stats_enabled'] );	// first run?
 		
 		return $options;
 	}
@@ -61,7 +67,7 @@ class SimpleStats {
 			'login_required' => false,
 			'username' => '',
 			'password' => '',
-			'tz' => 'UTC',
+			'tz' => date_default_timezone_get(),
 			'lang' => 'en-gb',
 			'log_user_agents' => false,
 			'log_bots' => false,
@@ -69,7 +75,7 @@ class SimpleStats {
 			'aggregate_after' => 0,
 			'last_aggregated' => '0',
 			'salt' => sha1( rand() . date('Ymj') . 'simple-stats' . $_SERVER['SERVER_NAME'] ),
-			'version' => '1.0'
+			'db_version' => self::db_version
 		);
 		
 		$options = $this->load_options();

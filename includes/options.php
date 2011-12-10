@@ -1,22 +1,14 @@
 <?php
 function checked( $v1, $v2 = true ) {
-	if( $v1 == $v2 )
-		return ' checked ';
-	return '';
+	return ( $v1 == $v2 ) ? ' checked ' : '';
 }
 
 function selected( $v1, $v2 = true ) {
-	if( $v1 == $v2 )
-		return ' selected ';
-	return '';
+	return ( $v1 == $v2 ) ? ' selected ' : '';
 }
 
 function tz_options( $selected_zone ) {
 	$opts = array();
-
-	if ( empty( $selected_zone ) )
-		$opts[] = '<option selected value="">Select a timezone</option>';
-
 	$selected = '';
 	if ( 'UTC' === $selected_zone )
 		$selected = 'selected ';
@@ -29,20 +21,26 @@ function tz_options( $selected_zone ) {
 	return implode( '', $opts );
 }
 
-
-
 function render_page() {
 	global $ss;
 	$options = $ss->options;
+	$password_placeholder = __( 'Enter a password' );
 	
-	if( isset($_POST['update_options'] ) ) {
-		foreach( array( 'stats_enabled', 'login_required', 'log_user_agents', 'log_bots' ) as $bool )
+	if( isset( $_POST['update_options'] ) ) {
+		foreach( array( 'stats_enabled', 'log_user_agents', 'log_bots' ) as $bool )
 			$options[$bool] = isset( $_POST[$bool] );
 		
 		foreach( array( 'site_name', 'username', 'password', 'tz', 'lang' ) as $text )
 			$options[$text] = $_POST[$text];
 			
 		$options['aggregate_after'] = intval( $_POST['aggregate_after'] );
+		
+		// set login option
+		$options['login_required'] = false;
+		if( isset( $_POST['login_required'] ) )
+			$options['login_required'] = 'all';
+		elseif( isset( $_POST['login_required_config'] ) )
+			$options['login_required'] = 'config';
 			
 		$ips = explode( "\n", str_replace( "\r\n", "\n", $_POST['ignored_ips'] ) );
 		$options['ignored_ips'] = array();
@@ -62,7 +60,7 @@ function render_page() {
 	echo '<p> ' . __( 'In order for Simple Stats to record hits on your site, you need to include the <code>stats-include.php</code> in your site\' code. Insert the following code where it will be run on every page load:' );
 	echo ' <code>' . htmlspecialchars( '<?php @include_once( \'' . str_replace( '\\', '/', SIMPLE_STATS_PATH ) . '/stats-include.php\' ); ?>' ) .'</code>';
 	
-	echo '<form action="?p=options" method="post">';
+	echo '<form action="?p=options" method="post" id="options-form">';
 	
 	$fields = array(
 		// option_name => array( label, input )
@@ -74,9 +72,13 @@ function render_page() {
 			__( 'Site name' ),
 			'<input type="text" id="site_name" name="site_name" value="' . htmlspecialchars( $options['site_name'] ) . '">'
 		),
+		'login_required_config' => array(
+			__( 'Require login to edit configuration' ) . '<br><small>' . __( 'Visits from users logged in to Simple Stats will not be recorded.' ) . '</small>',
+			'<input type="checkbox" id="login_required_config" name="login_required_config" value="1" ' . checked( $options['login_required'] ) . '>'
+		),
 		'login_required' => array(
-			__( 'Require login to view statistics' ) . '<br><small>' . __( 'Visits from users logged in to Simple Stats will not be recorded.' ) . '</small>',
-			'<input type="checkbox" id="login_required" name="login_required" value="1" ' . checked( $options['login_required'] ) . '>'
+			__( 'Require login to view statistics' ),
+			'<input type="checkbox" id="login_required" name="login_required" value="1" ' . checked( $options['login_required'], 'all' ) . '>'
 		),
 		'username' => array(
 			__( 'Username for Simple Stats login' ),
@@ -91,7 +93,7 @@ function render_page() {
 			'<select id="tz" name="tz">' . tz_options( $options['tz'] ) . '</select>'
 		),
 		'lang' => array(
-			__( 'Language' ) . '<br><small>' . __( 'Please enter your language identifier in the form "en-gb"' ) . '</small>',
+			__( 'Language' ) . '<br><small>' . __( 'Please enter your language identifier in the form "en-gb".' ) . '</small>',
 			'<input type="text" id="lang" name="lang" maxlength="5" size="5" value="' . $options['lang'] . '">'
 		),
 		'log_user_agents' => array(
@@ -103,17 +105,17 @@ function render_page() {
 			'<input type="checkbox" id="log_bots" name="log_bots" value="1" ' . checked( $options['log_bots'] ) . '>'
 		),
 		'ignored_ips' => array( 
-			__( 'Ignore these IP addresses:' ),
+			__( 'Ignore these IP addresses:' . '<br><small>' . __( 'Please enter one IP address per line.' ) . '</small>' ),
 			'<textarea id="ignored_ips" name="ignored_ips">' . implode( "\n", $options['ignored_ips'] ) . '</textarea>'
 		),
 		'aggregate_after' => array(
-			__( 'Aggregate data after:' ) . '<br><small>' . __( 'Aggregrating data will significantly reduce the sixe of the database, but will mean that you can only view summarised data for each month.' ) . '</small>',
+			__( 'Aggregate data after:' ) . '<br><small>' . __( 'Aggregrating data will significantly reduce the size of the database, but will mean that you can only view summarised data for each month.' ) . '</small>',
 			'<select type="checkbox" id="aggregate_after" name="aggregate_after">'.
 			'<option value="0"' . selected($options['aggregate_after'], 0) . '>' . __('never aggregate data') . '</option>'.
 			'<option value="3"' . selected($options['aggregate_after'], 3) . '>3 ' . __('months') . '</option>'.
 			'<option value="6"' . selected($options['aggregate_after'], 6) . '>6 ' . __('months') . '</option>'.
-			'<option value="6"' . selected($options['aggregate_after'], 9) . '>9 ' . __('months') . '</option>'.
-			'<option value="6"' . selected($options['aggregate_after'], 12) . '>12 ' . __('months') . '</option>'.
+			'<option value="9"' . selected($options['aggregate_after'], 9) . '>9 ' . __('months') . '</option>'.
+			'<option value="12"' . selected($options['aggregate_after'], 12) . '>12 ' . __('months') . '</option>'.
 			'</select>'
 		),
 	);
@@ -129,18 +131,30 @@ function render_page() {
 	
 	echo '<p class="center"><input type="submit" name="update_options" value="' . __( 'Update options' ) . '">';
 	
-	echo '</div>'; //main
+	echo '</form></div>'; //main
 	?>
 	<script>
 	$(document).ready( function(){
-		$("#login_required").change( function(){
-			var up = $("#username, #password, #ignore_logged_in").closest("tr");
-			if( $(this).is(":checked") )
-				up.fadeIn();
-			else 
-				up.fadeOut();
+		var needs_password = false;
+		$("#login_required, #login_required_config").change( function(){
+			var uprow = $("#username, #password").closest("tr");
+			if( $("#login_required").is(":checked") || $("#login_required_config").is(":checked") ) {
+				uprow.fadeIn();
+				needs_password = true;
+			}
+			else {
+				uprow.fadeOut();
+				needs_password = false;
+			}
 		});
-		$("#login_required").change();
+		$("#login_required, #login_required_config").change();
+		
+		$("#options-form").submit( function(e){
+			if( needs_password && ( ! $("#username").val() || ! $("#password").val() ) ) {
+				e.preventDefault();
+				alert( "<?php echo htmlspecialchars( __( 'You have not supplied a username and/or password. Please enter a username and password to enable restricted access.' ) );?>" );
+			}
+		});
 	});
 	</script>
 	<?php
