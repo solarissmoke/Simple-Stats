@@ -13,10 +13,14 @@ $title = htmlspecialchars( $title );
 		<?php 
 		if ( $page == 'overview' || $page == 'paths' ) {
 			echo '<script src="js/spin.min.js"></script>';
-		}
-		if ( $page == 'overview' ) {
-			echo '<script src="js/jquery.flot.min.js"></script>';
-			echo '<script src="js/overview.js"></script>';
+
+			if ( $page == 'overview' ) {
+				echo '<script src="js/jquery.flot.min.js"></script>';
+				echo '<script src="js/overview.js"></script>';
+			}
+			else if ( $page == 'paths' ) {
+				echo '<script src="js/paths.js"></script>';
+			}
 		}
 	}
 	?>

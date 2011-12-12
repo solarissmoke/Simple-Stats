@@ -12,7 +12,7 @@ class SimpleStatsHit {
 			return;
 		
 		$data = array();
-		$data['remote_ip'] = substr( $this->_determine_remote_ip(), 0, 15 );
+		$data['remote_ip'] = substr( $this->determine_remote_ip(), 0, 15 );
 		// check whether to ignore this hit
 		foreach ( $ss->options['ignored_ips'] as $ip ) {
 			if ( strpos( $data['remote_ip'], $ip ) === 0 )
@@ -23,12 +23,12 @@ class SimpleStatsHit {
 		$url = parse_url( $data['referrer'] );
 		$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 255 );
 		
-		$data['country']  = $this->_determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
+		$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
 		$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );
 		$data['domain']   = isset( $url['host'] ) ? preg_replace( '/^www\./', '', $url['host'] ) : '';
 		$data['domain']   = substr( $data['domain'], 0, 255 );
 		
-		$data['search_terms'] = substr( $ss->utf8_encode( $this->_determine_search_terms( $url ) ), 0, 255 );
+		$data['search_terms'] = substr( $ss->utf8_encode( $this->determine_search_terms( $url ) ), 0, 255 );
 
 		if ( isset( $_SERVER['REQUEST_URI'] ) )
 			$data['resource'] = $_SERVER['REQUEST_URI'];
@@ -45,7 +45,7 @@ class SimpleStatsHit {
 
 		$data['resource'] = substr( $ss->utf8_encode( $data['resource'] ), 0, 255 );
 		
-		$browser = $this->_parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
+		$browser = $this->parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
 		$data['platform'] = substr( $browser['platform'], 0, 50 );
 		$data['browser']  = substr( $browser['browser'], 0, 50 );
 		$data['version']  = substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
@@ -123,28 +123,32 @@ class SimpleStatsHit {
 	}
 	
 	/**
-	 * Determines the visitor’s IP address.
+	 * Try to work out the original client IP address.
 	 */
-	function _determine_remote_ip() {
-		$remote_addr = $_SERVER['REMOTE_ADDR'];
-		if ( ( $remote_addr == '127.0.0.1' || $remote_addr == '::1' || $remote_addr == $_SERVER['SERVER_ADDR'] ) &&
-		     isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) && $_SERVER['HTTP_X_FORWARDED_FOR'] ) {
-			// There may be multiple comma-separated IPs for the X-Forwarded-For header
-			// if the traffic is passing through more than one explicit proxy. Take the
-			// last one as being valid. This is arbitrary, but there is no way to know
-			// which IP relates to the client computer. We pick the first client IP as
-			// this is the client closest to our upstream proxy.
-			$remote_addrs = explode( ', ', $_SERVER['HTTP_X_FORWARDED_FOR'] );
-			$remote_addr = $remote_addrs[0];
+	private function determine_remote_ip() {
+		// headers to look for, in order of priority
+		$headers_to_check = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED_HOST' );
+
+		foreach( $headers_to_check as $header ) {
+			if( empty( $_SERVER[$header] ) )
+				continue;
+
+			$ips = explode( ',', $_SERVER[$header] );
+			$ips = array_reverse( $ips );
+			foreach( $ips as $ip ) {
+				$ip = trim( $ip );
+				if( $ip && ! preg_match( '/^(127\.|10\.|172\.1[0-6]\.|172\.2[0-0]\.|172\.3[0-1]\.|192\.168\.)/', $ip ) )	// we don't want private network IPs
+					return $ip;
+			}
 		}
 		
-		return $remote_addr;
+		return $_SERVER['REMOTE_ADDR'];
 	}
 	
 	/**
 	 * Determines the visitor’s country based on their IP address.
 	 */
-	function _determine_country( $_ip ) {
+	private function determine_country( $_ip ) {
 		if ( SimpleStats::is_geoip() ) {
 			if( ! function_exists( 'geoip_open' ) && ! class_exists( 'GeoIP' ) )		// it's possible the user has another instance running
 				include_once( SIMPLE_STATS_PATH.'/geoip/geoip.php' );
@@ -159,7 +163,7 @@ class SimpleStatsHit {
 	/**
 	 * Detects referrals from search engines and tries to determine the search terms.
 	 */
-	function _determine_search_terms( $_url ) {
+	private function determine_search_terms( $_url ) {
 		if ( !is_array( $_url ) )
 			$_url = parse_url( $_url );
 		
@@ -214,7 +218,7 @@ class SimpleStatsHit {
 	/**
 	 * Attempts to identify the browser info from its user agent string.
 	 */
-	function _parse_user_agent( $_ua ) {
+	private function parse_user_agent( $_ua ) {
 		$browser = $version = $platform = '';
 		
 		$platforms = array(	// name => string (or if empty, use the name )

@@ -18,7 +18,7 @@ function render_page() {
 		}
 	}
 
-	echo '<table id="paths" class="center wide"><thead>';
+	echo '<table id="paths" class="center wide" data:offset="' . $offset . '" data:page_size="' . $page_size . '"><thead>';
 	echo '<tr><th colspan="2" class="left">' . __( 'IP Address' ) . '/' . __( 'Pages' );
 	echo '<th>' . __( 'Time' );
 	echo '<th class="nb">' . __( 'Browser' );
