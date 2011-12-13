@@ -1,8 +1,9 @@
 $(document).ready( function(){
-	function activateFilter(field, value) {
-		var sel = $('select[name="'+field+'"]');
-		sel.closest('p').addClass('activefilter');
-		sel.val(value).trigger('change');
+	var main = $("#main"), side = $("#side");
+	
+	// if a non-hashtag filter brought us here, change it to a hashtag one
+	if( location.href.indexOf("?") != -1 ) {
+		window.location = "./#" + location.href.substr( location.href.indexOf("?") + 1 );
 	}
 	
 	function handleHashChange() {
@@ -12,32 +13,26 @@ $(document).ready( function(){
 		href += location.hash.substr(1);
 
 		$.get(href, function(data) {
-			$('#main').html($(data).find("#main").html());
-			$('#side').html($(data).find("#side").html());
-			
-			$("#filters .clear-filter").click( function(e){
-				e.preventDefault();
-				$(this).parent().find(":input").val("0").change();
-			});
-			
+			data = $(data);
+			main.html(data.find("#main").html());
+			side.html(data.find("#side").html());
 			overviewRefresh();
 		}, "html");
 	}
 	
 	function overviewRefresh() {
 		// js/no-js
-		$(".hide-if-js").hide();
-		$(".hide-if-no-js").show();
+		main.find(".hide-if-js").hide();
+		side.find(".hide-if-js").hide();
+		main.find(".hide-if-no-js").show();
+		side.find(".hide-if-no-js").show();
 		
 		// toggle links
-		$('a.toggle').click( function(e) {
+		main.find('a.toggle').click( function(e) {
 			e.preventDefault();
 			var a = $(this);
 			a.toggleClass("unfolded");
-			if( a.hasClass("unfolded") )
-				a.css("border-color", "#000 #FFF #FFF #FFF");
-			else
-				a.css("border-color", "#FFF #FFF #FFF #000"); 
+			a.css("border-color", a.hasClass("unfolded") ? "#000 #FFF #FFF #FFF" : "#FFF #FFF #FFF #000" );
 				
 			var id = a.attr('id');
 			if (id != '')
@@ -45,19 +40,23 @@ $(document).ready( function(){
 		});
 		
 		// filter links
-		$('#main a[href^="./?filter_"], table.calendar a').click(function(e) {
+		$("#main a.filter, #side table.calendar a").click(function(e) {
 			e.preventDefault();
-			location.hash = $(this).attr("href").replace(/\.\/\??/, "" );
+			location.hash = $(this).attr("href").replace(/^\.\/\??/, "" );
 		});
 		
+		main.find("a.filter").attr("title", i18n.filter_title);
+		main.find("a.ext").attr("title", i18n.ext_link_title);
+		
 		// handle filters changing
-		$('#filters :input').change( function() {
+		var filters = $('#filters :input');
+		filters.change( function() {
 			$("#filters .clear-filter").remove();	// remove old x's
 			
 			var hash = '';
 			var separator = '#';
-			$('#filters :input').each(function() {
-				var i = $(this), name = i.attr("name"), val = i.val(), p = $(this).parent();
+			filters.each(function() {
+				var i = $(this), name = i.attr("name"), val = i.val();
 				if ( !name )
 					return;
 				
@@ -66,25 +65,30 @@ $(document).ready( function(){
 					hash += name + '=' + encodeURIComponent( val );
 					separator = '&';
 					if( i.is("select") )
-						p.prepend("<a class='clear-filter'>&#215;</a> ");
+						i.parent().addClass("active-filter").prepend("<a class='clear-filter'>&#215;</a> ");
 				}
 			});
 			
 			location.hash = hash;
 		});
 		
+		// filters being removed
+		$("#filters .clear-filter").click( function(){
+			$(this).parent().find(":input").val("0").change();
+		});
+		
 		// make the filter section pretty
-		var s = $("#side").css("padding-bottom", "10px"), m = $("#main"), diff = m.innerHeight() - s.innerHeight();
+		side.css("padding-bottom", "10px");
+		var diff = main.innerHeight() - side.innerHeight();
 		if( diff )
-			s.css("padding-bottom", ( 10 + diff ) + "px");
+			side.css("padding-bottom", ( 10 + diff ) + "px");
 			
 		// ajax activity indicator
-		var ajax = $('<div id="ajaxindicator"></div>');
-		ajax.css({position: "absolute", top: "20px", right: "20px"});
-		$('#overviewpage #main').prepend(ajax);
+		var ajax = $('<div id="ajaxindicator"></div>').css( {position: "absolute", top: "20px", right: "20px"} );
+		main.prepend(ajax);
 		
 		// show/hide ajax activity indicator
-		$(document).ajaxStart(function() { 
+		$(document).ajaxStart(function() {
 			var spinner = new Spinner({ lines: 10, length: 5, width: 2, radius: 4, color: '#000', speed: 1, trail: 60, shadow: false}).spin(ajax[0]);
 		}).ajaxStop(function() { 
 			$('#ajaxindicator').empty();
@@ -99,6 +103,7 @@ $(document).ready( function(){
 			legend: { show: false },
 			grid: { hoverable: true },
 			xaxis: { tickSize: 1, tickDecimals: 0 },
+			yaxis: { tickDecimals: 0 }
 		};
 		
 		var cdata = $("#chart-data");

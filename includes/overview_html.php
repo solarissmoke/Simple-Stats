@@ -1,5 +1,6 @@
 <?php
 function render_page_html() {
+	scripts_i18n();
 	page_head();
 	display_filters();
 	display_content();
@@ -97,8 +98,9 @@ function filter_select( $id ) {
 	
 	$active = isset( $filters[$id] );
 	$box = $active ? '<a class="clear-filter hide-if-no-js">&#215;</a> ' : '';
-	echo "<p>$box<select name='filter_$id'>";
-	echo "<option value='0' class='first'>— $title</option>";
+	$class = $active ? 'class="active-filter"' : '';
+	echo "<p $class>$box<select name='filter_$id'>";
+	echo "<option value='0' class='first'>— $title";
 	
 	if ( $active ) {
 		$new_filters = $filters;
@@ -124,7 +126,7 @@ function filter_select( $id ) {
 			
 			$value = htmlspecialchars( $value );
 			$label = htmlspecialchars( $label );
-			echo "<option value='$value' $selected class='activefilter'>$label</option>";
+			echo "<option value='$value' $selected class='activefilter'>$label";
 
 			$x++;
 			if ( $x == 50 ) 
@@ -142,7 +144,7 @@ function filter_select( $id ) {
 			
 			$value = htmlspecialchars( $value );
 			$label = htmlspecialchars( $label );
-			echo "<option value='$value'>$label</option>";
+			echo "<option value='$value'>$label";
 			$x++;
 			if ( $x == 50 ) { break; }
 		}
@@ -205,12 +207,12 @@ function table_total( $id, $format = 'narrow' ) {
 		$new_filters[$id] = $key;
 		
 		echo '<tr><td>';
-		if ( $id == 'referrer' ) {
-			echo '<a class="goto" title="' . __('Visit this referrer page') . '" href="' . htmlspecialchars( $key ) . '" rel="external nofollow noreferrer">&rarr;</a> ';
-		}
+		if ( $id == 'referrer' )
+			echo '<a class="goto ext" href="' . htmlspecialchars( $key ) . '" rel="external noreferrer">&rarr;</a> ';
+
 
 		echo filter_link( $new_filters, $key );
-		echo "<td class='center' title='$date_label'>".format_number( $hits, 0 );
+		echo "<td class='center'>".format_number( $hits, 0 );
 		
 		$pos++;
 		if ( $pos >= $max_rows ) 
@@ -221,7 +223,7 @@ function table_total( $id, $format = 'narrow' ) {
 }
 
 function table_percent( $id, $format = 'narrow') {
-	global $filters, $loaded_data, $date_label, $field_names;
+	global $filters, $loaded_data, $field_names;
 	
 	if( isset( $filters[$id] ) )
 		return;
@@ -253,11 +255,9 @@ function table_percent( $id, $format = 'narrow') {
 		$pct = $total ? ( $hits / $total * 100 ) : 0;
 		
 		echo '<tr><td>';
-		if ( $id == 'browser'  ) {
-			echo '<a class="toggle" title="" id="browser_'.preg_replace( '/[^a-z]/', '', strtolower( $key ) );
-			echo '" href="#">+</a> ';
-		}
-		
+		if ( $id == 'browser'  )
+			echo '<a class="toggle" id="browser_' . preg_replace( '/[^a-z]/', '', strtolower( $key ) ) . '">+</a> ';
+
 		if( $id == 'country' )
 			$label = country_name( $key );
 		else 
@@ -265,7 +265,7 @@ function table_percent( $id, $format = 'narrow') {
 		
 		echo filter_link( $new_filters, ( $key == '' ) ? __( 'Unknown' ) : $label );
 		
-		echo '<td class="center" title="'.$date_label.'">'.format_number( $pct );
+		echo '<td class="center">'.format_number( $pct );
 			
 		if ( $id == 'browser' && $key != '' && ( isset( $loaded_data['visits']['version'][$key] ) ) ) {
 			foreach ( $loaded_data['visits']['version'][$key] as $key2 => $hits2 ) {
@@ -328,7 +328,7 @@ function chart( $what = 'days' ) {
 	// send the data as a hidden table which we'll parse using JS
 	echo "<table id='chart-data' style='display:none' data:vtitle='$vtitle' data:htitle='$htitle'>";
 	foreach( $visits as $x => $y )
-		echo "<tr><th>$x<td class='v'>$y<td class='h'>{$hits[$x]}";
+		echo "<tr><th>$x<td>$y<td>{$hits[$x]}";
 	echo '</table>';
 }
 
@@ -386,7 +386,7 @@ function calendar_widget() {
 	echo '<table class="calendar center"><thead>';
 	echo '<tr>';
 	echo "<th>$prev_link";
-	echo '<th colspan="5"><a class="thismonth" href="./' . filter_url( next_period( $prev ) ) . '" title="' . date_label( $filters, false ).'">' . date_label( $filters, false ) . '</a>';
+	echo '<th colspan="5"><a href="./' . filter_url( next_period( $prev ) ) . '" title="' . date_label( $filters, false ).'">' . date_label( $filters, false ) . '</a>';
 	echo "<th>$next_link";
 	
 	if( $is_archive ) {
@@ -410,12 +410,8 @@ function calendar_widget() {
 	for ( $w = 0; $w < sizeof( $table ); $w++ ) {
 		echo '<tr>';
 		for ( $d = 0; $d < 7; $d++ ) {
-			if ( $table[$w][$d] == 0 )
-				echo '<td>';
-			elseif ( isset( $filters['dy'] ) && $filters['dy'] == $table[$w][$d] )
-				echo '<td class="selected">';
-			else
-				echo '<td class="dy">';
+			$class = ( isset( $filters['dy'] ) && $filters['dy'] == $table[$w][$d] ) ? ' class="selected"' : '';
+			echo "<td{$class}>";
 
 			if ( $table[$w][$d] > 0 ) {
 				if ( $filters['yr'] == $actual_yr && $filters['mo'] == $actual_mo && $table[$w][$d] > $actual_dy ) {

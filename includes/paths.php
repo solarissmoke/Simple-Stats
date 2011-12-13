@@ -1,6 +1,7 @@
 <?php
 function render_page() {
 	global $ss;
+	scripts_i18n();
 	page_head();
 
 	echo '<div id="main">';
@@ -59,7 +60,7 @@ function render_page() {
 			$r = htmlspecialchars( $resource );
 			
 			echo '<tr>';
-			echo '<td colspan="2" class="left"><a href="' . $r . '" title="' . __( 'Visit this page' ) . '" class="goto">&rarr;</a> ' . filter_link( array( 'resource' => $resource ), $resource ) . "<td>$time";
+			echo '<td colspan="2" class="left"><a href="' . $r . '" class="goto">&rarr;</a> ' . filter_link( array( 'resource' => $resource ), $resource ) . "<td>$time";
 			
 			if ( $row == 0 && ! empty( $visit['referrer'] ) ) {
 				echo '<td colspan="3" class="right">';
@@ -67,7 +68,7 @@ function render_page() {
 					echo filter_link( array( 'search_terms' => $visit['search_terms'] ), $visit['search_terms'] );
 				else
 					echo filter_link( array( 'domain' => $visit['domain'] ), $visit['domain'] );
-				echo ' <a href="' . htmlspecialchars( $visit['referrer'] ) . '" rel="external nofollow noreferrer" class="goto" title="' . __( 'Visit this referrer page' ) .'">&rarr;</a>';
+				echo ' <a href="' . htmlspecialchars( $visit['referrer'] ) . '" rel="external noreferrer" class="goto ext">&rarr;</a>';
 			} else {
 				echo '<td colspan="3">&nbsp;';
 			}
@@ -79,36 +80,6 @@ function render_page() {
 
 	echo '</table>';
 	echo '<nav class="center wide hide-if-no-js"><a class="ajax" style="display:block; padding: 5px" id="load-more">— ' . __( 'more' ) . ' —</a></nav>';
-
 	echo '</div>';
-
-	?>
-	<script>
-	$(document).ready( function(){
-		$(".hide-if-no-js").show();
-		var offset = <?php echo $offset; ?>;
-		var loading = false;
-		var lm = $("#load-more"), text = lm.text();
-		lm.click( function(e){ 
-			e.preventDefault();
-			offset += <?php echo $page_size; ?>;
-			if( loading )
-				return;
-			loading = true;
-			lm.text('\u00A0');	// nbsp
-			var spinner = new Spinner({ lines: 10, length: 5, width: 2, radius: 4, color: '#000', speed: 1, trail: 60, shadow: false}).spin(lm[0]);
-			$.get('./?p=paths&offset=' + offset, function(data) {
-				loading = false;
-				lm.empty().text(text);
-				var rows = $(data).find('#paths tbody').children();
-				if( rows.length )
-					$('#paths tbody').append(rows.fadeIn(1000));
-				else 
-					$("#load-more").text("<?php echo __( 'No more data to show' );?>").parent().delay(2000).fadeOut(2000);
-			});
-		});
-	});
-	</script>
-	<?php
 	page_foot();
 }

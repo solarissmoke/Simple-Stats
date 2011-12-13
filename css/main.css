@@ -126,13 +126,36 @@ code {
 	border-bottom: 0
 }
 
-.calendar td, .calendar th {padding: 0; font-size: 0.8em}
-.calendar .selected a {background: #AFA}
-.calendar  a.future {color: #000; background: transparent}
-#filters select {width: 120px; font-size: 9pt; line-height: 1em; padding: 2px}
-.clear-filter{cursor: pointer; color: #900; font-weight: bold; border: 1px solid #AAA; padding: 0 2px}
-.hide-if-no-js {display: none}
-a.ajax{ cursor: pointer }
+.calendar td, .calendar th {
+	padding: 0;
+	font-size: 0.8em
+}
+.calendar .selected a { background: #AAF }
+.calendar  a.future {
+	color: #000;
+	background: transparent
+}
+#filters select {
+	width: 110px;
+	font-size: 9pt;
+	line-height: 1em;
+	padding: 2px
+}
+#filters p.active-filter {
+	border: 1px solid #CCC;
+	padding: 2px;
+	background: #AAF
+}
+.clear-filter{
+	cursor: pointer;
+	color: #900;
+	font-weight: bold;
+	border: 1px solid #AAA;
+	padding: 0 2px;
+	display: inline
+}
+.hide-if-no-js { display: none }
+a.ajax, a.toggle{ cursor: pointer }
 
 #wrap .center {text-align: center}
 #wrap .left {text-align: left}

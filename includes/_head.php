@@ -5,28 +5,26 @@ $title = htmlspecialchars( $title );
 ?>
 <!DOCTYPE html><html>
 <head>
-	<?php if( ! $ajax ) { ?>
-		<meta name="robots" content="noindex,nofollow">
-		<title><?php echo $title;?></title><link rel="stylesheet" href="css/main.css">
-		<!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->
-		<script src="js/jquery.js"></script>
-		<?php 
-		if ( $page == 'overview' || $page == 'paths' ) {
-			echo '<script src="js/spin.min.js"></script>';
+<?php if( ! $ajax ) {
+	echo '<meta name="robots" content="noindex,nofollow">' .
+		'<title>' . $title .'</title><link rel="stylesheet" href="css/main.css">' .
+		'<!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->' .
+		'<script src="js/jquery.js"></script>';
 
-			if ( $page == 'overview' ) {
-				echo '<script src="js/jquery.flot.min.js"></script>';
-				echo '<script src="js/overview.js"></script>';
-			}
-			else if ( $page == 'paths' ) {
-				echo '<script src="js/paths.js"></script>';
-			}
+	if ( $page == 'overview' || $page == 'paths' ) {
+		echo '<script src="js/spin.min.js"></script>';
+
+		if ( $page == 'overview' ) {
+			echo '<script src="js/jquery.flot.min.js"></script>';
+			echo '<script src="js/overview.js"></script>';
+		}
+		else if ( $page == 'paths' ) {
+			echo '<script src="js/paths.js"></script>';
 		}
 	}
-	?>
-<body id="<?php echo $page; ?>page">
-<div id="wrap">
-<?php
+}
+echo "<body id='{$page}page'><div id='wrap'>";
+
 if( !$ajax ) {
 	echo "<header><h1><a href='./'>$title</a></h1>";
 	if( $ss->is_installed() ) {

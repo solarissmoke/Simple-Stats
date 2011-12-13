@@ -1,9 +1,8 @@
 $(document).ready( function(){
 	$(".hide-if-no-js").show();
-	var offset = parseInt( $("#paths").attr("data:offset") );
-	var page_size = parseInt( $("#paths").attr("data:page_size") )
-	var loading = false;
-	var lm = $("#load-more"), text = lm.text();
+	var table = $("#paths");
+	var offset = parseInt( table.attr("data:offset") ), page_size = parseInt( table.attr("data:page_size") )
+	var loading = false, lm = $("#load-more"), text = lm.text();
 	lm.click( function(e){ 
 		e.preventDefault();
 		offset += page_size;
@@ -19,8 +18,16 @@ $(document).ready( function(){
 			if( rows.length )
 				$('#paths tbody').append(rows.fadeIn(1000));
 			else 
-				$("#load-more").text("<?php echo __( 'No more data to show' );?>").parent().delay(2000).fadeOut(2000);
+				$("#load-more").text("No more data to show").parent().delay(1000).fadeOut(2000);
+			onUpdate();
 		});
 	});
+	
+	function onUpdate() {
+		table.find("a.filter").attr("title", i18n.filter_title);
+		table.find("a.goto").attr("title", i18n.link_title);
+		table.find("a.ext").attr("title", i18n.ext_link_title);
+	}
+	onUpdate();
 });
 	

@@ -1,12 +1,11 @@
 <?php
-
 function page_head() {
 	global $ss, $filters, $page, $ajax;
 	include( SIMPLE_STATS_PATH.'/includes/_head.php' );
 }
 
 function page_foot() {
-	global $ss, $ajax;
+	global $ss, $ajax, $script_i18n;
 	include( SIMPLE_STATS_PATH.'/includes/_foot.php' );
 }
 
@@ -24,7 +23,7 @@ function filter_link( $_filters, $text ) {
 		return $text;
 	
 	$url = filter_url( $_filters );
-	return "<a href='./$url' title='" . __( 'Filter results for this item' ) . "'>$text</a>";
+	return "<a href='./$url' class='filter'>$text</a>";
 }
 
 function get_date_filter( $yr, $mo, $dy = false ) {
@@ -105,4 +104,11 @@ function sp2nb( $_str ) {
 /* i18n - needs work */
 function __( $str ) {
 	return $str;
+}
+
+function scripts_i18n(){
+	global $script_i18n;
+	$script_i18n['filter_title'] = __( 'Filter results for this item' );
+	$script_i18n['link_title'] = __( 'Visit this page' );
+	$script_i18n['ext_link_title'] = __( 'Visit this referrer page' );
 }
