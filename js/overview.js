@@ -1,23 +1,39 @@
 $(document).ready( function(){
-	var main = $("#main"), side = $("#side");
+	var main = $("#main"),
+		side = $("#side"),
+		title = $(document).attr("title"),
+		cache = {};
+
+	// clear the cache every 10 minutes
+	setInterval( function(){ cache = {}; }, 36000000 );
+
+	// set up initial state which may not be filter-free
+	var qs = ( location.href.indexOf("?") != -1 ) ? location.href.substr( location.href.indexOf("?") + 1 ) : "";
+	History.replaceState( {filter: qs}, title, "./?" + qs );
+
+	History.Adapter.bind( window,'statechange',function(){
+		var state = History.getState();
+		// check cache
+		if( cache[state.data.filter] ) {
+			updateData( cache[state.data.filter] );
+		}
+		else {
+			$.get("./", 'ajax=1&' + state.data.filter, function( data ) {
+				cache[state.data.filter] = data;
+				updateData( data );
+			}, "html");
+		}
+	});
 	
-	// if a non-hashtag filter brought us here, change it to a hashtag one
-	if( location.href.indexOf("?") != -1 ) {
-		window.location = "./#" + location.href.substr( location.href.indexOf("?") + 1 );
+	function updateData( data ) {
+		data = $(data);
+		main.html(data.find("#main").html());
+		side.html(data.find("#side").html());
+		overviewRefresh();
 	}
 	
-	function handleHashChange() {
-		var href = location.href.substr(0, location.href.indexOf('#'));
-		href += (href.indexOf('?') > -1) ? '&' : '?';
-		href += 'ajax=1&';
-		href += location.hash.substr(1);
-
-		$.get(href, function(data) {
-			data = $(data);
-			main.html(data.find("#main").html());
-			side.html(data.find("#side").html());
-			overviewRefresh();
-		}, "html");
+	function changeState( qs ) {
+		History.pushState( {filter: qs}, title, "./?" + qs  );	// will trigger a statechange event
 	}
 	
 	function overviewRefresh() {
@@ -42,7 +58,7 @@ $(document).ready( function(){
 		// filter links
 		$("#main a.filter, #side table.calendar a").click(function(e) {
 			e.preventDefault();
-			location.hash = $(this).attr("href").replace(/^\.\/\??/, "" );
+			changeState( $(this).attr("href").replace(/^\.\/\??/, "" ) );
 		});
 		
 		main.find("a.filter").attr("title", i18n.filter_title);
@@ -53,23 +69,20 @@ $(document).ready( function(){
 		filters.change( function() {
 			$("#filters .clear-filter").remove();	// remove old x's
 			
-			var hash = '';
-			var separator = '#';
+			var qvs = [];
 			filters.each(function() {
 				var i = $(this), name = i.attr("name"), val = i.val();
 				if ( !name )
 					return;
 				
 				if ( val != "0" ) {
-					hash += separator;
-					hash += name + '=' + encodeURIComponent( val );
-					separator = '&';
+					qvs.push( name + '=' + encodeURIComponent( val ) );
 					if( i.is("select") )
 						i.parent().addClass("active-filter").prepend("<a class='clear-filter'>&#215;</a> ");
 				}
 			});
 			
-			location.hash = hash;
+			changeState( qvs.join("&") );
 		});
 		
 		// filters being removed
@@ -159,14 +172,6 @@ $(document).ready( function(){
 			});
 		}
 	}
-	
-	// handle window.onhashchange
-	$(window).bind('hashchange', function() {
-		handleHashChange();
-	});
-
-	if( location.hash )
-		handleHashChange();
 
 	overviewRefresh();
 });

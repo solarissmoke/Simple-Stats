@@ -15,6 +15,7 @@ $title = htmlspecialchars( $title );
 		echo '<script src="js/spin.min.js"></script>';
 
 		if ( $page == 'overview' ) {
+			echo '<script src="js/jquery.history.js"></script>';
 			echo '<script src="js/jquery.flot.min.js"></script>';
 			echo '<script src="js/overview.js"></script>';
 		}

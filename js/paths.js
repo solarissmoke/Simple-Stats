@@ -19,15 +19,15 @@ $(document).ready( function(){
 				$('#paths tbody').append(rows.fadeIn(1000));
 			else 
 				$("#load-more").text("No more data to show").parent().delay(1000).fadeOut(2000);
-			onUpdate();
+			onUpdate( rows );
 		});
 	});
 	
-	function onUpdate() {
-		table.find("a.filter").attr("title", i18n.filter_title);
-		table.find("a.goto").attr("title", i18n.link_title);
-		table.find("a.ext").attr("title", i18n.ext_link_title);
+	function onUpdate( context ) {
+		context.find("a.filter").attr("title", i18n.filter_title);
+		context.find("a.goto").attr("title", i18n.link_title);
+		context.find("a.ext").attr("title", i18n.ext_link_title);
 	}
-	onUpdate();
+	onUpdate( table );
 });
 	
