@@ -35,7 +35,7 @@ if( !$ajax ) {
 
 		if( $ss->options['login_required'] != 'all' || is_logged_in() ) {
 			echo '<li><a href="./" ' . ( $page == 'overview' ? 'class="current"' : '' ) . '>' . __( 'Overview' ) . '</a>';
-			echo '<li><a href="./?p=paths" ' . ( $page == 'paths' ? 'class="current"' : '' ) . '>' . __( 'Latest visits' ) . '</a>';
+			echo '<li><a href="./?p=paths" ' . ( $page == 'paths' ? 'class="current"' : '' ) . '>' . __( 'Latest visitors' ) . '</a>';
 			echo '<li><a href="./?p=options" ' . ( $page == 'options' ? 'class="current"' : '' ) . '>' . __( 'Configuration' ) . '</a>';
 		}
 

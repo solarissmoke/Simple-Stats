@@ -12,8 +12,8 @@ $visits_tbl_fields = array(
 	'referrer'       => 'VARCHAR(255) NOT NULL DEFAULT ""',
 	'search_terms'   => 'VARCHAR(255) NOT NULL DEFAULT ""',
 	'user_agent'     => 'VARCHAR(255) NOT NULL DEFAULT ""',
-	'platform'       => 'VARCHAR(50) NOT NULL DEFAULT ""',
-	'browser'        => 'VARCHAR(50) NOT NULL DEFAULT ""',
+	'platform'       => 'TINYINT(3) NOT NULL DEFAULT "0"',
+	'browser'        => 'TINYINT(3) NOT NULL DEFAULT "0"',
 	'version'        => 'VARCHAR(15) NOT NULL DEFAULT ""',
 	'date'			=>  'DATE NOT NULL',
 	'start_time'     => 'TIME NOT NULL',
@@ -105,6 +105,8 @@ elseif( $action == 'install_tables' ) {
 	foreach ( $visits_tbl_fields as $field_name => $field_type )
 		$visits_query .= "\n\t`$field_name` $field_type,";
 	$visits_query .= "\n\tKEY `date` (`date`)".
+	$visits_query .= "\n\tKEY `ua` (`browser`, `platform`)".
+	$visits_query .= "\n\tKEY `country` (`country`)".
 	"\n) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin";
 
 	$archive_query = "CREATE TABLE `{$ss->tables['archive']}` (";

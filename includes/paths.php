@@ -18,13 +18,15 @@ function render_page() {
 			$visits[] = $assoc;
 		}
 	}
+	
+	$ua = new SimpleStatsUA();
 
 	echo '<table id="paths" class="center wide" data:offset="' . $offset . '" data:page_size="' . $page_size . '"><thead>';
 	echo '<tr><th colspan="2" class="left">' . __( 'IP Address' ) . '/' . __( 'Pages' );
 	echo '<th>' . __( 'Time' );
-	echo '<th class="nb">' . __( 'Browser' );
-	echo '<th class="nb">' . __( 'Operating system' );
-	echo '<th class="nb">' . __( 'Country' );
+	echo '<th>' . __( 'Browser' );
+	echo '<th>' . __( 'Operating system' );
+	echo '<th>' . __( 'Country' );
 	echo '<tbody>';
 
 	foreach ( $visits as $visit ) {
@@ -35,17 +37,14 @@ function render_page() {
 		$dy_label = strftime( '%d %b', $start_ts );	
 		$start_ts = date( 'H:i', $start_ts );
 
+		$full_ua = ( $ss->options['log_user_agents'] && !empty( $visit['user_agent'] ) ) ? htmlspecialchars( $visit['user_agent'] ) : '';
 		
 		echo '<tr class="visit-header">';
 		echo '<td colspan="2" class="left">' . htmlspecialchars( $visit['remote_ip'] );
 		echo '<td>'.$dy_label.'</td>';
-		echo '<td class="nb">' . htmlspecialchars( $visit['browser'] ) . ' ' . htmlspecialchars( $visit['version'] );
-		echo '<td class="nb">' . htmlspecialchars( $visit['platform'] );
-		echo '<td class="nb">' . htmlspecialchars( country_name( $visit['country'] ) ) . '</tr>';
-		
-		if( $ss->options['log_user_agents'] && !empty( $visit['user_agent'] ) ) {
-			echo '<tr class="visit-header"><td colspan="6" class="left"><small>' . htmlspecialchars( $visit['user_agent'] ) . '</small>';
-		}
+		echo '<td class="ua" title="' . $full_ua . '">' . htmlspecialchars( $ua->browser_name_from_id( $visit['browser'] ) ) . ' ' . htmlspecialchars( $visit['version'] );
+		echo '<td>' . htmlspecialchars( $ua->platform_name_from_id( $visit['platform'] ) );
+		echo '<td>' . htmlspecialchars( country_name( $visit['country'] ) ) . '</tr>';
 		
 		$row = 0;
 		foreach ( $hits as $hit ) {
@@ -59,7 +58,7 @@ function render_page() {
 			
 			$r = htmlspecialchars( $resource );
 			
-			echo '<tr>';
+			echo '<tr class="hit">';
 			echo '<td colspan="2" class="left"><a href="' . $r . '" class="goto">&rarr;</a> ' . filter_link( array( 'resource' => $resource ), $resource ) . "<td>$time";
 			
 			if ( $row == 0 && ! empty( $visit['referrer'] ) ) {

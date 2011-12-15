@@ -18,6 +18,7 @@ define( 'SIMPLE_STATS_PATH', realpath( dirname( __FILE__ ) ) );
 if( file_exists( SIMPLE_STATS_PATH.'/config.php' ) )
 	require_once( SIMPLE_STATS_PATH.'/config.php' );
 require_once( SIMPLE_STATS_PATH.'/includes/classes.php' );
+require_once( SIMPLE_STATS_PATH.'/includes/ua.php' );
 require_once( SIMPLE_STATS_PATH.'/includes/functions.php' );
 include_once( SIMPLE_STATS_PATH.'/includes/countries.php' );
 

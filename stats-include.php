@@ -2,6 +2,7 @@
 define( 'SIMPLE_STATS_PATH', realpath( dirname( __FILE__ ) ) );
 include_once( SIMPLE_STATS_PATH.'/config.php' );
 include_once( SIMPLE_STATS_PATH.'/includes/classes.php' );
+include_once( SIMPLE_STATS_PATH.'/includes/ua.php' );
 
 class SimpleStatsHit {
 	function __construct() {
@@ -45,13 +46,14 @@ class SimpleStatsHit {
 
 		$data['resource'] = substr( $ss->utf8_encode( $data['resource'] ), 0, 255 );
 		
-		$browser = $this->parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
-		$data['platform'] = substr( $browser['platform'], 0, 50 );
-		$data['browser']  = substr( $browser['browser'], 0, 50 );
+		$ua = new SimpleStatsUA();
+		$browser = $ua->parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
+		$data['platform'] = $browser['platform'];
+		$data['browser']  = $browser['browser'];
 		$data['version']  = substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
 		
 		// check whether to ignore this hit
-		if ( $data['browser'] == 'Crawler' && $ss->options['log_bots'] == false )
+		if ( $data['browser'] == 1 && $ss->options['log_bots'] == false )
 			return;
 		
 		$t = time();
@@ -214,119 +216,6 @@ class SimpleStatsHit {
 		
 		return $search_terms;
 	}
-	
-	/**
-	 * Attempts to identify the browser info from its user agent string.
-	 */
-	private function parse_user_agent( $_ua ) {
-		$browser = $version = $platform = '';
-		
-		$platforms = array(	// name => string (or if empty, use the name )
-			'Windows' => 'Win',
-			'iPod' => '',
-			'iPad' => '',
-			'iPhone' => '',
-			'Android' => '',
-			'Symbian' => 'Symbian',
-			'Symbian' => 'SymbOS',
-			'Nintendo Wii' => '',
-			'PlayStation Portable' => '',
-			'Macintosh' => 'Mac',
-			'Linux' => '',
-			'FreeBSD' => '',
-			'i-mode' => 'DoCoMo'
-		);
-		
-		foreach( $platforms as $name => $str ) {
-			if( empty( $str ) )
-				$str = $name;
-			if( strpos( $_ua, $str ) !== false ) {
-				$platform = $name;
-				break;
-			}
-		}
-		
-		$bots = array(
-			'charlotte', 'crawl', 'bot', 'bloglines', 'dtaagent', 'feedfetcher', 'ia_archiver', 'java', 'larbin', 'mediapartners', 'metaspinner', 'searchmonkey', 'slurp', 'spider', 'teoma', 'ultraseek', 'waypath', 'yacy', 'yandex', 'scoutjet', 'harvester', 'facebookexternal', 'mail.ru/' );
-			
-		foreach( $bots as $str ) {
-			if( stripos( $_ua, $str ) !== false ) {
-				$browser = 'Crawler';
-				break;
-			}
-		}
-		
-		$sniffs = array( // string, name for display, version regexp, version match, platform (optional)
-			array( 'Opera Mini', 'Opera Mini', 'Opera Mini( |/)([\d\.]+)', 2 ),
-			array( 'Opera', 'Opera', 'Version/([\d\.]+)', 1 ),
-			array( 'Opera', 'Opera', 'Opera( |/)([\d\.]+)', 2 ),
-			array( 'MSIE', 'Internet Explorer', 'MSIE ([\d\.]+)', 1 ),
-			array( 'Epiphany', 'Epiphany', 'Epiphany/([\d\.]+)',  1 ),
-			array( 'Fennec', 'Fennec', 'Fennec/([\d\.]+)',  1 ),
-			array( 'Firefox', 'Firefox', 'Firefox/([\d\.]+)',  1 ),
-			array( 'Iceweasel', 'Iceweasel', 'Iceweasel/([\d\.]+)',  1 ),
-			array( 'Minefield', 'Minefield', 'Minefield/([\d\.]+)',  1 ),
-			array( 'Minimo', 'Minimo', 'Minimo/([\d\.]+)',  1 ),
-			array( 'Flock', 'Flock', 'Flock/([\d\.]+)',  1 ),
-			array( 'Firebird', 'Firebird', 'Firebird/([\d\.]+)', 1 ),
-			array( 'Phoenix', 'Phoenix', 'Phoenix/([\d\.]+)', 1 ),
-			array( 'Camino', 'Camino', 'Camino/([\d\.]+)', 1 ),
-			array( 'Flock', 'Flock', 'Flock/([\d\.]+)',  1 ),
-			array( 'Chimera', 'Chimera', 'Chimera/([\d\.]+)', 1 ),
-			array( 'Thunderbird', 'Thunderbird', 'Thunderbird/([\d\.]+)',  1 ),
-			array( 'Netscape', 'Netscape', 'Netscape[0-9]?/([\d\.]+)', 1 ),
-			array( 'OmniWeb', 'OmniWeb', 'OmniWeb/([\d\.]+)', 1 ),
-			array( 'Iron', 'Iron', 'Iron/([\d\.]+)', 1 ),
-			array( 'Chrome', 'Chrome', 'Chrome/([\d\.]+)', 1 ),
-			array( 'Chromium', 'Chromium', 'Chromium/([\d\.]+)', 1 ),
-			array( 'Safari', 'Safari', 'Version/([\d\.]+)', 1 ),
-			array( 'Safari', 'Safari', 'Safari/([\d\.]+)', 1 ),
-			array( 'iCab', 'iCab', 'iCab/([\d\.]+)', 1 ),
-			array( 'Konqueror', 'Konqueror', 'Konqueror/([\d\.]+)', 1, 'Linux' ),
-			array( 'Midori', 'Midori', 'Midori/([\d\.]+)',  1 ),
-			array( 'DoCoMo', 'DoCoMo', 'DoCoMo/([\d\.]+)', 1 ),
-			array( 'Lynx', 'Lynx', 'Lynx/([\d\.]+)', 1 ),
-			array( 'Links', 'Links', '\(([\d\.]+)', 1 ),
-			array( 'W3C_Validator', 'W3C Validator', 'W3C_Validator/([\d\.]+)', 1 ),
-			array( 'ApacheBench', 'Apache Bench tool (ab)', 'ApacheBench/(.*)$', 1 ),
-			array( 'lwp-request', 'libwww Perl library', 'lwp-request/(.*)$', 1 ),
-			array( 'w3m', 'w3m', 'w3m/([\d\.]+)', 1 ),
-			array( 'Wget', 'Wget', 'Wget/([\d\.]+)', 1 ),
-			array( 'WordPress', 'WordPress', 'WordPress/([\d\.]+)', 1 )
-		);
-			
-		if( !$browser ) {
-			foreach ( $sniffs as $sniff ) {
-				if ( strpos( $_ua, $sniff[0] ) !== false ) {
-					$browser = $sniff[1];
-					preg_match( '!' . $sniff[2] . '!', $_ua, $b );
-					if ( sizeof( $b ) > $sniff[3] ) {
-						$version = $b[ $sniff[3] ];
-						if ( sizeof( $sniff ) == 5 ) 
-							$platform = $sniff[4];
-						break;
-					}
-				}
-			}
-		}
-		
-		
-		// old Netscape and Mozilla - can probably get rid of this
-		if ( !$browser ) {
-			if ( strpos( $_ua, 'Mozilla/4' ) !== false && stripos( $_ua, 'compatible' ) === false ) {
-				$browser = 'Netscape';
-				preg_match( '/Mozilla/([\d\.]+)/', $_ua, $b );
-				$version = $b[1];
-			} elseif ( ( strpos( $_ua, 'Mozilla/5' ) !== false && stripos( $_ua, 'compatible' ) === false ) || strpos( $_ua, 'Gecko' ) !== false ) {
-				$browser = 'Mozilla';
-				preg_match( '/rv:([\d\.]+)/', $_ua, $b );
-				$version = $b[1];
-			}
-		}
-		
-		return compact( 'browser', 'version', 'platform' );
-	}
-	
 }
 
 new SimpleStatsHit();

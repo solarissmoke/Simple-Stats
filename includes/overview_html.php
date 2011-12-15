@@ -38,12 +38,22 @@ function display_filters(){
 }
 
 function display_content(){
-	global $date_label, $filters, $ss, $loaded_data, $is_archive, $field_names;
+	global $date_label, $filters, $has_filters, $ss, $loaded_data, $is_archive, $field_names;
 	
 	echo '<div id="main">';
 	$date_label = htmlspecialchars( date_label( $filters ) );
 	
 	echo "<h1>$date_label</h1>";
+	
+	if( $has_filters ) {
+		echo '<div id="filter-notice" class="wide center">';
+		foreach( $field_names as $field => $name )
+			if( isset( $filters[$field] ) ) {
+				$label = htmlspecialchars( get_value_label( $field, $filters[$field]  ) );
+				echo "<span class='active-filter'><a class='clear-filter hide-if-no-js' data:filter='filter_$field'>&#215;</a> $name: <var>$label</var></span> ";
+			}
+		echo '</div>';
+	}
 	
 	if( $is_archive )
 		echo '<p class="center">(' . __('aggregated') . ')</p>';
@@ -85,7 +95,7 @@ function display_content(){
 }
 
 function filter_select( $id ) {
-	global $filters, $loaded_data, $field_names;
+	global $filters, $loaded_data, $field_names, $ua;
 	
 	$title = $field_names[$id];
 	// make sure we're looking in the right place
@@ -97,10 +107,10 @@ function filter_select( $id ) {
 	$data = (array) $data;
 	
 	$active = isset( $filters[$id] );
-	$box = $active ? '<a class="clear-filter hide-if-no-js">&#215;</a> ' : '';
+	$box = $active ? "<a class='clear-filter hide-if-no-js' data:filter='filter_$id'>&#215;</a> " : '';
 	$class = $active ? 'class="active-filter"' : '';
-	echo "<p $class>$box<select name='filter_$id'>";
-	echo "<option value='0' class='first'>— $title";
+	echo "<p $class>$box<select name='filter_$id' id='filter_$id'>";
+	echo "<option value='_' class='first'>— $title";
 	
 	if ( $active ) {
 		$new_filters = $filters;
@@ -116,16 +126,8 @@ function filter_select( $id ) {
 		$x = 0;
 		foreach ( array_keys( $unfiltered_data ) as $value ) {
 			$selected = ( $value == $filters[$id] ) ? 'selected' : '';
-			
-			if( $value == '' )
-				$label = __( 'Unknown' );
-			elseif( $id == 'country' )
-				$label = country_name( $value );
-			else 
-				$label = $value;
-			
+			$label = htmlspecialchars( get_value_label( $id, $value ) );
 			$value = htmlspecialchars( $value );
-			$label = htmlspecialchars( $label );
 			echo "<option value='$value' $selected class='activefilter'>$label";
 
 			$x++;
@@ -135,18 +137,12 @@ function filter_select( $id ) {
 	} else {
 		$x = 0;
 		foreach ( array_keys( $data ) as $value ) {
-			if( $value == '' )
-				$label = __( 'Unknown' );
-			elseif( $id == 'country' )
-				$label = country_name( $value );
-			else 
-				$label = $value;
-			
+			$label = htmlspecialchars( get_value_label( $id, $value ) );
 			$value = htmlspecialchars( $value );
-			$label = htmlspecialchars( $label );
 			echo "<option value='$value'>$label";
 			$x++;
-			if ( $x == 50 ) { break; }
+			if ( $x == 50 )
+				break;
 		}
 	}	
 	echo '</select></p>';
@@ -170,6 +166,19 @@ function table_summary() {
 	echo "<td width='33%'>$visits " . __( 'Visits' );
 	echo "<td width='33%'>$ips " . __( 'Unique IPs' );
 	echo '</table>';
+}
+
+function get_value_label( $field, $key ) {
+	global $ua;
+	if( ! $key )
+		return __( 'Unknown' );
+	if( $field == 'country' )
+		return country_name( $key );
+	if( $field == 'browser' )
+		return $ua->browser_name_from_id( $key );
+	if( $field == 'platform' )
+		return $ua->platform_name_from_id( $key );
+	return $key;
 }
 
 function table_total( $id, $format = 'narrow' ) {
@@ -223,7 +232,7 @@ function table_total( $id, $format = 'narrow' ) {
 }
 
 function table_percent( $id, $format = 'narrow') {
-	global $filters, $loaded_data, $field_names;
+	global $filters, $loaded_data, $field_names, $ua;
 	
 	if( isset( $filters[$id] ) )
 		return;
@@ -256,12 +265,9 @@ function table_percent( $id, $format = 'narrow') {
 		
 		echo '<tr><td>';
 		if ( $id == 'browser'  )
-			echo '<a class="toggle" id="browser_' . preg_replace( '/[^a-z]/', '', strtolower( $key ) ) . '">+</a> ';
+			echo '<a class="toggle" id="browser_' .  $key . '">+</a> ';
 
-		if( $id == 'country' )
-			$label = country_name( $key );
-		else 
-			$label = $key;
+		$label = get_value_label( $id, $key );
 		
 		echo filter_link( $new_filters, ( $key == '' ) ? __( 'Unknown' ) : $label );
 		
@@ -270,7 +276,7 @@ function table_percent( $id, $format = 'narrow') {
 		if ( $id == 'browser' && $key != '' && ( isset( $loaded_data['visits']['version'][$key] ) ) ) {
 			foreach ( $loaded_data['visits']['version'][$key] as $key2 => $hits2 ) {
 				$pct = ( $total > 0 ) ? $hits2 / $total * 100 : 0;
-				echo '<tr class="detail detail_browser_'.preg_replace( '/[^a-z]/', '', strtolower( $key ) ).'">';
+				echo '<tr class="detail detail_browser_'.$key.'">';
 				echo '<td>' . htmlspecialchars( $key2 );
 				echo '<td class="center">'.format_number( $pct );
 			}
@@ -321,8 +327,8 @@ function chart( $what = 'days' ) {
 	
 	echo '<div class="hide-if-no-js">';
 	echo '<h4 id="chart-title">' . $vtitle . '</h4>';
-	echo '<div class="wide" id="chart" style="height: 180px; border:none"></div>';
-	echo '<div id="chartopt"><small>' . __( 'Show:' ) . ' <a class="ajax" data:show="h">' . __( 'hits' ) . '</a> | <a class="ajax current" data:show="v">' . __( 'visits' ) . '</a></small></div>';
+	echo '<div class="wide" id="chart" style="height: 160px; border:none"></div>';
+	echo '<div id="chartopt"><small>' . __( 'Show:' ) . ' <a class="ajax" data:show="h">' . __( 'hits' ) . '</a> &middot; <a class="ajax current" data:show="v">' . __( 'visits' ) . '</a></small></div>';
 	echo '</div>';
 	
 	// send the data as a hidden table which we'll parse using JS

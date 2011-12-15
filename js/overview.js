@@ -75,7 +75,7 @@ $(document).ready( function(){
 				if ( !name )
 					return;
 				
-				if ( val != "0" ) {
+				if ( val != "_" ) {
 					qvs.push( name + '=' + encodeURIComponent( val ) );
 					if( i.is("select") )
 						i.parent().addClass("active-filter").prepend("<a class='clear-filter'>&#215;</a> ");
@@ -86,8 +86,8 @@ $(document).ready( function(){
 		});
 		
 		// filters being removed
-		$("#filters .clear-filter").click( function(){
-			$(this).parent().find(":input").val("0").change();
+		$(".clear-filter").click( function(){
+			$( "#" + $(this).attr("data:filter") ).val("_").change();
 		});
 		
 		// make the filter section pretty
@@ -110,12 +110,11 @@ $(document).ready( function(){
 		// charts
 		var lineChartOptions = {
 			series: {
-				lines: { show: true },
-				points: { show: true }
+				bars: { show: true, align: "center" }
 			},
 			legend: { show: false },
 			grid: { hoverable: true },
-			xaxis: { tickSize: 1, tickDecimals: 0 },
+			xaxis: { tickLength: 2, tickSize: 1, tickDecimals: 0 },
 			yaxis: { tickDecimals: 0 }
 		};
 		

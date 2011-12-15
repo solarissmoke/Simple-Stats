@@ -141,10 +141,12 @@ code {
 	line-height: 1em;
 	padding: 2px
 }
-#filters p.active-filter {
-	border: 1px solid #CCC;
+.active-filter {
+	border: 1px solid #AAA;
 	padding: 2px;
-	background: #AAF
+	background: #AAF;
+	display: inline-block;
+	border-radius: 4px
 }
 .clear-filter{
 	cursor: pointer;
@@ -152,8 +154,17 @@ code {
 	font-weight: bold;
 	border: 1px solid #AAA;
 	padding: 0 2px;
-	display: inline
+	display: inline;
+	background: #FFF
 }
+var {
+	background: #FFF;
+	padding: 0 5px;
+}
+
+#filter-notice { padding: 5px 10px }
+#filter-notice span {margin: 2px}
+
 .hide-if-no-js { display: none }
 a.ajax, a.toggle{ cursor: pointer }
 
@@ -166,11 +177,17 @@ a.ajax, a.toggle{ cursor: pointer }
 	width: 96%;
 	font-size: 10pt;
 	text-align: right;
-	margin-bottom: 10px
+	margin-bottom: 10px;
+}
+
+#chartopt a {
+	padding: 0 2px
 }
 
 #chartopt a.current{
-	text-decoration: underline
+	border: 1px solid #CCC;
+	border-radius: 4px;
+	background: #EEE
 }
 
 .toggle {
@@ -184,15 +201,17 @@ a.ajax, a.toggle{ cursor: pointer }
 	border-width: 5px;
 }
 
-#paths tbody td {
-	border: 1px solid #EEE;
-}
-
-#paths tbody td, #paths th{
-	border-left: none;
-	border-right: none;
-}
-
 #paths tbody tr { color: #777 }
 
-#paths .visit-header { background: #FAFAFA }
+#paths th, #paths tbody td, #paths tbody tr {
+	border: none;
+}
+
+#paths tr.visit-header {
+	border-top: 1px solid #CCC;
+	background: #FAFAFA 
+}
+
+#paths tr.hit td:first-child {
+	padding-left: 20px
+}

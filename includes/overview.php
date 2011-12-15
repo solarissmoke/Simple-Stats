@@ -2,6 +2,7 @@
 $ajax = ( isset( $_REQUEST['ajax'] ) && $_REQUEST['ajax'] == 1 );
 $is_archive = false;
 $script_i18n = array();
+$ua = new SimpleStatsUA();
 
 $field_names = array(
 	'remote_ip' => __( 'IP addresses' ),

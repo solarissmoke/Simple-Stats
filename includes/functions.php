@@ -31,7 +31,7 @@ function get_date_filter( $yr, $mo, $dy = false ) {
 	$dy = $dy ? sprintf( '%02d', $dy ) : '';
 	
 	if( !$dy && $yr == date('Y') && $mo == date('m') )
-		return '0';
+		return '_';
 	
 	return "$yr-$mo" . ( $dy ? "-$dy" : '' );
 }
@@ -50,7 +50,7 @@ function filter_url( $_filters ) {
 	$mo = isset( $_filters['mo'] ) ?  $_filters['mo'] : date('m');
 	$dy = isset( $_filters['dy'] ) ? $_filters['dy'] : false;
 	$date =  get_date_filter( $yr, $mo, $dy );
-	if( $date )
+	if( $date != '_' )
 		$cleaned_filters['date'] = $date;
 	
 	$sep = '?';

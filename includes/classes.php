@@ -7,7 +7,7 @@ class SimpleStats {
 	public $options = array();
 	public $tz;
 	const version = '1.0.1';
-	const db_version = 1;
+	const db_version = 2;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -21,8 +21,10 @@ class SimpleStats {
 		$this->options = $this->load_options();
 		
 		// upgrade check
-		if( $this->installed && ( !isset( $this->options['db_version'] ) || $this->options['db_version'] < self::db_version ) )
+		if( $this->installed && ( !isset( $this->options['db_version'] ) || $this->options['db_version'] < self::db_version ) ) {
+			$this->upgrade();
 			$this->setup_options();
+		}
 	}
 	
 	function is_installed() {
@@ -60,6 +62,29 @@ class SimpleStats {
 		return $options;
 	}
 	
+	private function upgrade() {
+		if( isset( $this->options['db_version'] ) && $this->options['db_version'] < 2 ) {
+			// upgrade from db version 1 to 2 - platform and browser columns have changed to integer values
+			$ua = new SimpleStatsUA();
+			$table = $this->tables['visits'];
+			foreach( $ua->get_all_browser_names() as $id => $name ) {
+				$this->query( "UPDATE `$table` SET `browser` = '$id' WHERE `browser` = '$name'" );
+			}
+			$this->query( "UPDATE `$table` SET `browser` = '1' WHERE `browser` = 'Crawler'" );
+			$this->query( "UPDATE `$table` SET `browser` = CEIL(`browser`)" );	// fixes any we missed
+			$this->query( "ALTER TABLE `$table` MODIFY `browser` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
+			
+			foreach( $ua->get_all_platform_names() as $id => $name ) {
+				$this->query( "UPDATE `$table` SET `platform` = '$id' WHERE `platform` = '$name'" );
+			}
+			$this->query( "UPDATE `$table` SET `platform` = CEIL(`platform`)" );
+			$this->query( "ALTER TABLE `$table` MODIFY `platform` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
+			
+			$this->query( "ALTER TABLE `$table` ADD KEY `ua`(`browser`, `platform`)" );
+			$this->query( "ALTER TABLE `$table` ADD KEY `country`(`country`)" );
+		}
+	}
+	
 	function setup_options() {
 		$defaults = array(
 			'stats_enabled' => true,
@@ -86,6 +111,8 @@ class SimpleStats {
 				$this->add_option( $k, $v );
 			}
 		}
+		
+		$this->update_option( 'db_version', self::db_version );
 		
 		$this->options = $this->load_options();	// reload
 	}
@@ -147,11 +174,11 @@ class SimpleStats {
 		return strtolower( $lang_choice );
 	}
 	
-	static function parse_version( $_raw_version, $_parts=2 ) {
+	static function parse_version( $_raw_version, $_parts = 2 ) {
 		$version_numbers = explode( '.', $_raw_version );
 		$value = '';
 
-		for ( $x=0; $x<$_parts; $x++ ) {
+		for ( $x = 0; $x < $_parts; $x++ ) {
 			if ( sizeof( $version_numbers ) > $x ) {
 				if ( $value != '' ) {
 					$value .= '.';
