@@ -104,9 +104,9 @@ elseif( $action == 'install_tables' ) {
 	$visits_query = "CREATE TABLE `{$ss->tables['visits']}` (";
 	foreach ( $visits_tbl_fields as $field_name => $field_type )
 		$visits_query .= "\n\t`$field_name` $field_type,";
-	$visits_query .= "\n\tKEY `date` (`date`)".
-	$visits_query .= "\n\tKEY `ua` (`browser`, `platform`)".
-	$visits_query .= "\n\tKEY `country` (`country`)".
+	$visits_query .= "\n\tKEY `date` (`date`)," .
+		"\n\tKEY `ua` (`browser`, `platform`)," .
+		"\n\tKEY `country` (`country`)" .
 	"\n) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin";
 
 	$archive_query = "CREATE TABLE `{$ss->tables['archive']}` (";
