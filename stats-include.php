@@ -136,7 +136,6 @@ class SimpleStatsHit {
 				continue;
 
 			$ips = explode( ',', $_SERVER[$header] );
-			$ips = array_reverse( $ips );
 			foreach( $ips as $ip ) {
 				$ip = trim( $ip );
 				if( $ip && ! preg_match( '/^(127\.|10\.|172\.1[0-6]\.|172\.2[0-0]\.|172\.3[0-1]\.|192\.168\.)/', $ip ) )	// we don't want private network IPs
