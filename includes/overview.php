@@ -150,7 +150,7 @@ function load_data( $_filters ) {
 	
 	$date_query = ( $start_date == $end_date ) ? "`date` = '$start_date'" : "`date` >= '$start_date' AND `date` <= '$end_date'";	
 	
-	$query = "SELECT * FROM `{$ss->tables['visits']}` WHERE $date_query";
+	$query = "SELECT * FROM `{$ss->tables['visits']}` WHERE `browser` != '1' AND $date_query";	// ignore robots for the overview
 	
 	foreach ( $fields as $key ) {
 		if( !isset( $_filters[$key] ) )

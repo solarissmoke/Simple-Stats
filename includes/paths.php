@@ -37,15 +37,23 @@ function render_page() {
 		$dy_label = strftime( '%d %b', $start_ts );	
 		$start_ts = date( 'H:i', $start_ts );
 
-		$full_ua = ( $ss->options['log_user_agents'] && !empty( $visit['user_agent'] ) ) ? htmlspecialchars( $visit['user_agent'] ) : '';
+		$full_ua = ( $ss->options['log_user_agents'] && !empty( $visit['user_agent'] ) ) ? $visit['user_agent'] : '';
 		
-		echo '<tr class="visit-header">';
+		if( $visit['browser'] == 0 )
+			$browser_name = '';
+		elseif( $visit['browser'] == 1 )
+			$browser_name = __( '(Robot)' );
+		else
+			$browser_name = $ua->browser_name_from_id( $visit['browser'] );
+
+		$robot_class = ( $visit['browser'] == 1 ) ? ' bot' : '';
+		echo "<tr class='visit-header$robot_class'>";
 		echo '<td colspan="2" class="left">' . htmlspecialchars( $visit['remote_ip'] );
 		echo '<td>'.$dy_label.'</td>';
-		echo '<td class="ua" title="' . $full_ua . '">' . htmlspecialchars( $ua->browser_name_from_id( $visit['browser'] ) ) . ' ' . htmlspecialchars( $visit['version'] );
+		echo '<td class="ua" title="' . htmlspecialchars( $full_ua ) . '">' . htmlspecialchars( $browser_name ) . ' ' . htmlspecialchars( $visit['version'] );
 		echo '<td>' . htmlspecialchars( $ua->platform_name_from_id( $visit['platform'] ) );
 		echo '<td>' . htmlspecialchars( country_name( $visit['country'] ) ) . '</tr>';
-		
+
 		$row = 0;
 		foreach ( $hits as $hit ) {
 			if ( empty( $hit ) )

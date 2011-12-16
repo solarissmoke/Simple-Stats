@@ -149,14 +149,20 @@ class SimpleStatsHit {
 	
 	/**
 	 * Determines the visitor’s country based on their IP address.
+	 * You can supply your own GeoIP information (two-letter country code) by
+	 * definining a constant SIMPLE_STATS_GEOIP_COUNTRY containing this value.
 	 */
 	private function determine_country( $_ip ) {
+		if( defined( 'SIMPLE_STATS_GEOIP_COUNTRY' ) && strlen( SIMPLE_STATS_GEOIP_COUNTRY <= 2 ) )
+			return SIMPLE_STATS_GEOIP_COUNTRY;
+
 		if ( SimpleStats::is_geoip() ) {
 			if( ! function_exists( 'geoip_open' ) && ! class_exists( 'GeoIP' ) )		// it's possible the user has another instance running
 				include_once( SIMPLE_STATS_PATH.'/geoip/geoip.php' );
 			$gi = geoip_open( SIMPLE_STATS_PATH.'/geoip/GeoIP.dat', GEOIP_STANDARD );
-			return geoip_country_code_by_addr( $gi, $_ip );
+			$result = geoip_country_code_by_addr( $gi, $_ip );
 			geoip_close( $gi );
+			return $result;
 		}
 		
 		return '';

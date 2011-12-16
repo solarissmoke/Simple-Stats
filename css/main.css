@@ -212,6 +212,8 @@ a.ajax, a.toggle{ cursor: pointer }
 	background: #FAFAFA 
 }
 
+#paths tr.bot { background: #FAFACC }
+
 #paths tr.hit td:first-child {
 	padding-left: 20px
 }

@@ -98,7 +98,7 @@ class SimpleStatsUA {
 	
 	function parse_user_agent( $_ua ) {
 		$default_version_regex = '/([\d\.]+)';
-		$result = array( 'browser' => '', 'version' => '', 'platform' => '' );
+		$result = array( 'browser' => 0, 'version' => '', 'platform' => 0 );
 		
 		$bots = array( 'charlotte', 'crawl', 'bot', 'bloglines', 'dtaagent', 'feedfetcher', 'ia_archiver', 'java', 'larbin', 'mediapartners', 'metaspinner', 'searchmonkey', 'slurp', 'spider', 'teoma', 'ultraseek', 'waypath', 'yacy', 'yandex', 'scoutjet', 'harvester', 'facebookexternal', 'mail.ru/' );
 		
@@ -139,7 +139,7 @@ class SimpleStatsUA {
 		if( isset( $this->browsers[$id] ) )
 			return isset( $this->browser_details[$id]['display_name'] ) ? $this->browser_details[$id]['display_name'] : $this->browsers[$id];
 		
-		return false;
+		return '';
 	}
 	
 	function platform_name_from_id( $id ) {
@@ -147,6 +147,6 @@ class SimpleStatsUA {
 		if( isset( $this->platforms[$id] ) )
 			return isset( $this->platform_details[$id]['display_name'] ) ? $this->platform_details[$id]['display_name'] : $this->platforms[$id];
 		
-		return false;
+		return '';
 	}
 }
