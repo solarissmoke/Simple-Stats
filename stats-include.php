@@ -152,7 +152,7 @@ class SimpleStatsHit {
 	 * definining a constant SIMPLE_STATS_GEOIP_COUNTRY containing this value.
 	 */
 	private function determine_country( $_ip ) {
-		if( defined( 'SIMPLE_STATS_GEOIP_COUNTRY' ) && strlen( SIMPLE_STATS_GEOIP_COUNTRY <= 2 ) )
+		if( defined( 'SIMPLE_STATS_GEOIP_COUNTRY' ) && strlen( SIMPLE_STATS_GEOIP_COUNTRY ) <= 2 )
 			return SIMPLE_STATS_GEOIP_COUNTRY;
 
 		if ( SimpleStats::is_geoip() ) {

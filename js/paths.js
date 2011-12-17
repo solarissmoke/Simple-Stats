@@ -22,11 +22,30 @@ $(document).ready( function(){
 			onUpdate( rows );
 		});
 	});
-	
+
+	var tooltip = $("<div id='ua_tooltip' style='padding: 10px; box-shadow: #CCC 2px 2px 5px; border: 1px solid #CCC; border-radius: 5px; background: #FFF'></div>");
+	var tooltipwrap = $("<div id='ua_tooltip_wrap' style='padding: 20px; position: absolute; z-index: 10'></div>").append( tooltip );
+	tooltipwrap.mouseleave( function(){
+		if( tooltipwrap.is(":visible") )
+			tooltipwrap.hide();
+	});
+	$("body").append(tooltipwrap);
+
+	function UAHelper(){
+		var td = $(this), ua = td.attr("title");
+		if( !ua )
+			return;
+
+		var offset = td.offset(), size = ua.length < 200 ? ua.length : 200;
+		tooltip.html( "<input type='text' style='min-width:250px; font: 10px Courier, sans-serif' value='" + ua + "' size='" + size + "'>" );
+		tooltipwrap.fadeIn().css( {top: offset.top + td.innerHeight() - 20 + "px", left: offset.left + ( td.width() - tooltip.width() ) / 2 - 20 + "px"} );
+	}
+
 	function onUpdate( context ) {
 		context.find("a.filter").attr("title", i18n.filter_title);
 		context.find("a.goto").attr("title", i18n.link_title);
 		context.find("a.ext").attr("title", i18n.ext_link_title);
+		context.find("td.ua").mouseover( UAHelper );
 	}
 	onUpdate( table );
 });
