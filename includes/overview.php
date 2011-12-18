@@ -5,17 +5,16 @@ $script_i18n = array();
 $ua = new SimpleStatsUA();
 
 $field_names = array(
-	'remote_ip' => __( 'IP addresses' ),
+	'remote_ip' => __( 'IP address' ),
 	'search_terms' => __( 'Search terms' ),
-	'domain' => __( 'Source domains' ),
-	'referrer' => __( 'Referrers' ),
-	'resource' => __( 'Pages' ),
-	'country' => __( 'Countries' ),
-	'language' => __( 'Languages' ),
-	'browser' => __( 'Browsers' ),
-	'version' => __( 'Versions' ),
-	'platform' => __( 'Operating systems' ),
-	'resolution' => __( 'Screen sizes' ),
+	'domain' => __( 'Source domain' ),
+	'referrer' => __( 'Referrer' ),
+	'resource' => __( 'Page' ),
+	'country' => __( 'Country' ),
+	'language' => __( 'Language' ),
+	'browser' => __( 'Browser' ),
+	'version' => __( 'Version' ),
+	'platform' => __( 'Operating system' ),
 	'source' => __( 'Visit source' )
 );
 
