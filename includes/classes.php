@@ -7,7 +7,7 @@ class SimpleStats {
 	public $options = array();
 	public $tz;
 	const version = '1.0.1';
-	const db_version = 2;
+	const db_version = 3;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -24,6 +24,12 @@ class SimpleStats {
 		if( $this->installed && ( !isset( $this->options['db_version'] ) || $this->options['db_version'] < self::db_version ) ) {
 			$this->upgrade();
 			$this->setup_options();
+		}
+		
+		if( $this->installed && defined( 'SIMPLE_STATS_PASSWORD_RESET' ) && SIMPLE_STATS_PASSWORD_RESET ) {
+			$this->update_option( 'password', '' );
+			$this->update_option( 'login_required', false );
+			$this->options = $this->load_options();
 		}
 	}
 	
@@ -63,7 +69,8 @@ class SimpleStats {
 	}
 	
 	private function upgrade() {
-		if( isset( $this->options['db_version'] ) && $this->options['db_version'] < 2 ) {
+		$v = isset( $this->options['db_version'] ) ? $this->options['db_version'] : 0;
+		if( $v && $v < 2 ) {
 			// upgrade from db version 1 to 2 - platform and browser columns have changed to integer values
 			$ua = new SimpleStatsUA();
 			$table = $this->tables['visits'];
@@ -82,6 +89,11 @@ class SimpleStats {
 			
 			$this->query( "ALTER TABLE `$table` ADD KEY `ua`(`browser`, `platform`)" );
 			$this->query( "ALTER TABLE `$table` ADD KEY `country`(`country`)" );
+		}
+		if( $v && $v < 3 ) {
+			// save password as hash
+			if( !empty( $this->options['password'] ) )
+				$this->update_option( 'password', $this->hash( trim( $this->options['password'] ) ) );
 		}
 	}
 	

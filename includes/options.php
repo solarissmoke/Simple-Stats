@@ -24,14 +24,17 @@ function tz_options( $selected_zone ) {
 function render_page() {
 	global $ss;
 	$options = $ss->options;
-	$password_placeholder = __( 'Enter a password' );
-	
+
 	if( isset( $_POST['update_options'] ) ) {
 		foreach( array( 'stats_enabled', 'log_user_agents', 'log_bots' ) as $bool )
 			$options[$bool] = isset( $_POST[$bool] );
 		
-		foreach( array( 'site_name', 'username', 'password', 'tz', 'lang' ) as $text )
+		foreach( array( 'site_name', 'username', 'tz', 'lang' ) as $text )
 			$options[$text] = $_POST[$text];
+
+		$pw = trim( $_POST['password'] );
+		if( $pw )	// password has been set/changed
+			$options['password'] = $ss->hash( $pw );
 			
 		$options['aggregate_after'] = intval( $_POST['aggregate_after'] );
 		
@@ -62,6 +65,9 @@ function render_page() {
 	
 	echo '<form action="?p=options" method="post" id="options-form">';
 	
+	if( defined( 'SIMPLE_STATS_PASSWORD_RESET' ) && SIMPLE_STATS_PASSWORD_RESET ) 
+		echo '<p style="color:red">' . __( 'Your Simple Stats username and password have been reset because you defined the constant <code>SIMPLE_STATS_PASSWORD_RESET</code> in your <code>config.php</code> file. Please remove that definition in order to set new login credentials.' );
+	
 	$fields = array(
 		// option_name => array( label, input )
 		'stats_enabled' => array( 
@@ -85,8 +91,8 @@ function render_page() {
 			'<input type="text" id="username" name="username" value="' . htmlspecialchars( $options['username'] ) . '">'
 		),
 		'password' => array(
-			__( 'Password for Simple Stats login' ),
-			'<input type="password" id="password" name="password" value="' . htmlspecialchars( $options['password'] ) . '">'
+			__( 'Password for Simple Stats login' ) . ( $options['password'] ? ' <small class="hide-if-js">' . __( '(saved, click to change)' ) . '</small>' : '' ),
+			'<input type="password" id="password" name="password" value="">' . ( $options['password'] ? '<input type="hidden" id="saved_password_exists" value="1">' : '' )
 		),
 		'tz' => array(
 			__( 'Time zone' ),
@@ -135,6 +141,8 @@ function render_page() {
 	?>
 	<script>
 	$(document).ready( function(){
+		$(".hide-if-js").hide();
+
 		var needs_password = false;
 		$("#login_required, #login_required_config").change( function(){
 			var uprow = $("#username, #password").closest("tr");
@@ -148,9 +156,25 @@ function render_page() {
 			}
 		});
 		$("#login_required, #login_required_config").change();
+
+		var pw = $("#password"), is_saved = $("#saved_password_exists").val();
+		if( is_saved ) {
+			var ph = $( '<a><?php echo htmlspecialchars( __( '(saved, click to change)' ) );?></a>' );
+			pw.hide().after( ph );
+			ph.click( function(){
+				ph.hide();
+				pw.show().focus();
+			});
+			pw.blur( function() {
+				if( !pw.val() ) {
+					pw.hide();
+					ph.show();
+				}
+			});
+		};
 		
 		$("#options-form").submit( function(e){
-			if( needs_password && ( ! $("#username").val() || ! $("#password").val() ) ) {
+			if( needs_password && ( ! $("#username").val() || ( ! pw.val() && ! is_saved ) ) ) {
 				e.preventDefault();
 				alert( "<?php echo htmlspecialchars( __( 'You have not supplied a username and/or password. Please enter a username and password to enable restricted access.' ) );?>" );
 			}

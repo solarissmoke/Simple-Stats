@@ -6,7 +6,7 @@ function render_page() {
 	
 	// process login request
 	if( isset( $_POST['simple-stats-login'] ) ) {
-		if( $_POST['username'] == $ss->options['username'] && $_POST['password'] == $ss->options['password'] ) {
+		if( $_POST['username'] == $ss->options['username'] && $ss->hash( trim( $_POST['password'] ) ) == $ss->options['password'] ) {
 			@setcookie( 'simple_stats', $ss->hash( $ss->options['username'] . $ss->options['password'] ), time() + 31536000, '/', '' );
 			header( 'Location: ./' . ( $origin ? './?p=' .  $origin : '' ), true, 302 );
 			exit;
