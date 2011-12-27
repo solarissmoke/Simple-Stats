@@ -46,7 +46,7 @@ class SimpleStatsUA {
 		// display_name, if different from string; regex - if different from default version regex; platform (overrides platform sniffing)
 		$this->browser_details = array(
 			3 => array( 'display_name' => 'Internet Explorer', 'regex' => 'MSIE ([\d\.]+)' ),
-			5 => array( 'regex' => '(?:Opera|Version)(?: |/)([\d\.]+)' ),
+			5 => array( 'regex' => 'Version(?: |/)([\d\.]+)' ),
 			6 => array( 'regex' => 'Opera Mini(?: |/)([\d\.]+)' ),
 			7 => array( 'regex' => '(?:Safari|Version)/([\d\.]+)' ),
 			19 => array( 'regex' => 'Netscape[0-9]?/([\d\.]+)' ),

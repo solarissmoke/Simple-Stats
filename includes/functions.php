@@ -64,7 +64,7 @@ function filter_url( $_filters ) {
 
 function format_number( $_number, $_dp = 1 ) {
 	$decimal = __( '.', 'decimal_point' );
-	$thousands = __( 'core', 'thousands_separator' );
+	$thousands = __( ' ', 'thousands_separator' );
 	$str = number_format( $_number, $_dp, $decimal, $thousands );
 	if ( $str == '0'.$decimal.'0' && $_dp == 1 ) {
 		$str2 = number_format( $_number, 2, $decimal, $thousands );
