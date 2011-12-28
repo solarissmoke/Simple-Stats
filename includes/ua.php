@@ -109,31 +109,61 @@ class SimpleStatsUA {
 			}
 		}
 		
+		$platform_matches = array();
+
 		foreach( $this->platforms as $id => $name ) {
-			if( strpos( $_ua, $name ) !== false ) {
-				$result['platform'] = $id;
-				break;
-			}
+			if( strpos( $_ua, $name ) !== false )
+				$platform_matches[] = $id;	// value = platform id
 		}
 		
+		if( $platform_matches )
+			$result['platform'] = $this->guess_platform( $platform_matches );
+
+		$browser_matches = array();
+
 		foreach ( $this->browsers as $id => $name ) {
 			$details = isset( $this->browser_details[$id] ) ? $this->browser_details[$id] : array();
 			if ( strpos( $_ua, $name ) !== false ) {
-				$result['browser'] = $id;
+				$ver = '';
 				$regex = isset( $details['regex'] ) ? $details['regex'] : $name . $default_version_regex;
 				preg_match( '!' . $regex . '!', $_ua, $b );
 				if ( $b ) {
-					$result['version'] = $b[1];
+					$ver = $b[1];
 					if ( isset( $details['platform'] ) ) 
 						$result['platform'] = $details['platform'];
-					break;
 				}
+
+				$browser_matches[$id] = $ver;	// key = browser id, value = version
 			}
 		}
 		
+		if( $browser_matches ) {
+			$result['browser'] = $this->guess_browser( array_keys( $browser_matches ) );
+			$result['version'] = $browser_matches[ $result['browser'] ];
+		}
+
 		return $result;	// an array of ( 'browser' (ID), 'version', 'platform' (ID) )
 	}
 	
+	private function guess_platform( $arr ) {
+		// currently, we just use the highest integer, because that works. So iPad trumps Macintosh, for example.
+		// But this may need more speicific rules for some UAs
+		return max( $arr );
+	}
+
+	private function guess_browser( $arr ) {
+		if( count( $arr ) == 1 )
+			return $arr[0];
+
+		$lowest = array( 5, 7 );	// "Opera" and "Safari" appear in many other browsers strings
+		foreach( $lowest as $low ) {
+			$key = array_search( $low, $arr );
+			if( count( $arr ) > 1 && $key !== false )
+				unset( $arr[$key] );
+		}
+		return max( $arr );
+	}
+
 	function browser_name_from_id( $id ) {
 		$id = intval( $id );
 		if( isset( $this->browsers[$id] ) )
