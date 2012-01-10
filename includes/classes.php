@@ -7,7 +7,7 @@ class SimpleStats {
 	public $options = array();
 	public $tz;
 	const version = '1.0.1';
-	const db_version = 3;
+	const db_version = 4;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -70,30 +70,34 @@ class SimpleStats {
 	
 	private function upgrade() {
 		$v = isset( $this->options['db_version'] ) ? $this->options['db_version'] : 0;
+		$visits_table = $this->tables['visits'];
 		if( $v && $v < 2 ) {
 			// upgrade from db version 1 to 2 - platform and browser columns have changed to integer values
 			$ua = new SimpleStatsUA();
-			$table = $this->tables['visits'];
 			foreach( $ua->get_all_browser_names() as $id => $name ) {
-				$this->query( "UPDATE `$table` SET `browser` = '$id' WHERE `browser` = '$name'" );
+				$this->query( "UPDATE `$visits_table` SET `browser` = '$id' WHERE `browser` = '$name'" );
 			}
-			$this->query( "UPDATE `$table` SET `browser` = '1' WHERE `browser` = 'Crawler'" );
-			$this->query( "UPDATE `$table` SET `browser` = CEIL(`browser`)" );	// fixes any we missed
-			$this->query( "ALTER TABLE `$table` MODIFY `browser` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
+			$this->query( "UPDATE `$visits_table` SET `browser` = '1' WHERE `browser` = 'Crawler'" );
+			$this->query( "UPDATE `$visits_table` SET `browser` = CEIL(`browser`)" );	// fixes any we missed
+			$this->query( "ALTER TABLE `$visits_table` MODIFY `browser` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
 			
 			foreach( $ua->get_all_platform_names() as $id => $name ) {
-				$this->query( "UPDATE `$table` SET `platform` = '$id' WHERE `platform` = '$name'" );
+				$this->query( "UPDATE `$visits_table` SET `platform` = '$id' WHERE `platform` = '$name'" );
 			}
-			$this->query( "UPDATE `$table` SET `platform` = CEIL(`platform`)" );
-			$this->query( "ALTER TABLE `$table` MODIFY `platform` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
+			$this->query( "UPDATE `$visits_table` SET `platform` = CEIL(`platform`)" );
+			$this->query( "ALTER TABLE `$visits_table` MODIFY `platform` TINYINT UNSIGNED NOT NULL DEFAULT '0'" );
 			
-			$this->query( "ALTER TABLE `$table` ADD KEY `ua`(`browser`, `platform`)" );
-			$this->query( "ALTER TABLE `$table` ADD KEY `country`(`country`)" );
+			$this->query( "ALTER TABLE `$visits_table` ADD KEY `ua`(`browser`, `platform`)" );
+			$this->query( "ALTER TABLE `$visits_table` ADD KEY `country`(`country`)" );
 		}
 		if( $v && $v < 3 ) {
 			// save password as hash
 			if( !empty( $this->options['password'] ) )
 				$this->update_option( 'password', $this->hash( trim( $this->options['password'] ) ) );
+		}
+		if( $v && $v < 4 ) {
+			// bump referrer field size
+			$this->query( "ALTER TABLE `$visits_table` MODIFY `referrer` VARCHAR(512) NOT NULL DEFAULT ''" );
 		}
 	}
 	

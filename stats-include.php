@@ -22,7 +22,7 @@ class SimpleStatsHit {
 		
 		$data['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
 		$url = parse_url( $data['referrer'] );
-		$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 255 );
+		$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 511 );
 		
 		$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
 		$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );

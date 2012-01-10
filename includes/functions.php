@@ -12,11 +12,11 @@ function page_foot() {
 function filter_link( $_filters, $text ) {
 	global $is_archive;
 	
+	$text = htmlspecialchars( $text );
+
 	// avoid super-long referrer strings
 	if( strlen( $text ) > 100 )
 		$text = substr( $text, 0, 100 ) . '&hellip;';
-	
-	$text = htmlspecialchars( $text );
 	
 	// cannot filter archives
 	if( $is_archive )
