@@ -30,7 +30,7 @@ function render_page() {
 	echo '<tbody>';
 
 	foreach ( $visits as $visit ) {
-		$start_ts = $ss->sql2time( $visit['date'] . ' ' . $visit['start_time'] );
+		$start_ts = strtotime( $visit['date'] . ' ' . $visit['start_time'] );
 	
 		$hits = explode( "\n", $visit['resource'] );
 		

@@ -176,10 +176,6 @@ class SimpleStats {
 		return iconv( $encoding, 'UTF-8', $_str );
 	}
 	
-	static function sql2time( $str ) {
-		return strtotime( $str . ' +0000' );
-	}
-	
 	static function determine_language() {
 		$lang_choice = '';
 		if ( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {

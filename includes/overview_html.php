@@ -219,7 +219,6 @@ function table_total( $id, $format = 'narrow' ) {
 		if ( $id == 'referrer' )
 			echo '<a class="goto ext" href="' . htmlspecialchars( $key ) . '" rel="external noreferrer">&rarr;</a> ';
 
-
 		echo filter_link( $new_filters, $key );
 		echo "<td class='center'>".format_number( $hits, 0 );
 		
@@ -274,6 +273,7 @@ function table_percent( $id, $format = 'narrow') {
 		echo '<td class="center">'.format_number( $pct );
 			
 		if ( $id == 'browser' && $key != '' && ( isset( $loaded_data['visits']['version'][$key] ) ) ) {
+			arsort( $loaded_data['visits']['version'][$key] );
 			foreach ( $loaded_data['visits']['version'][$key] as $key2 => $hits2 ) {
 				$pct = ( $total > 0 ) ? $hits2 / $total * 100 : 0;
 				echo '<tr class="detail detail_browser_'.$key.'">';

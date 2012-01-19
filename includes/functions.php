@@ -11,6 +11,9 @@ function page_foot() {
 
 function filter_link( $_filters, $text ) {
 	global $is_archive;
+
+	if( isset( $_filters['referrer'] ) || isset( $_filters['resource'] ) )
+		$text = urldecode( $text );
 	
 	$text = htmlspecialchars( $text );
 
