@@ -155,7 +155,7 @@ class SimpleStatsUA {
 		if( count( $arr ) == 1 )
 			return $arr[0];
 
-		$lowest = array( 3, 5, 7 );	// "MSIE", "Opera" and "Safari" appear in many other browsers strings
+		$lowest = array( 3, 5, 7, 22 );	// "MSIE", "Opera", "Safari", "Chromium" appear in many other browsers strings
 		foreach( $lowest as $low ) {
 			$key = array_search( $low, $arr );
 			if( count( $arr ) > 1 && $key !== false )

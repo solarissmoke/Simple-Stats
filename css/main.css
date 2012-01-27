@@ -219,6 +219,11 @@ a.ajax, a.toggle{ cursor: pointer }
 	background: #FAFAFA 
 }
 
+#paths tr.ua-row {
+	background: #FDFDFD;
+	font-family: monospace
+}
+
 #paths tr.bot { background: #FAFACC }
 
 #paths tr.hit td:first-child {
