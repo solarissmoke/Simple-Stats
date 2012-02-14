@@ -22,29 +22,22 @@ $(document).ready( function(){
 			onUpdate( rows );
 		});
 	});
-
-	function UAHighlight(){
-		if( $(this).attr("title") )
-			$(this).css("border-bottom", "1px dotted #CCC");
-	}
-	
-	function UAUnhighlight(){
-			$(this).css("border-bottom", "none");
-	}
 	
 	function UAShow(){
-		var td = $(this), ua = td.attr("title");
-		if(ua)
-			td.parent().after("<tr class='ua-row right'><td colspan='6'>" + ua + "</tr>");
-		td.unbind("click");
+		var td = $(this);
+		if( !td.attr("data:ua-visible") ){
+			td.parent().after("<tr class='ua-row right'><td colspan='6'>" + td.attr("title") + "</tr>");
+			td.attr("data:ua-visible", "1");
+		}
 	}
 
 	function onUpdate( context ) {
 		context.find("a.filter").attr("title", i18n.filter_title);
 		context.find("a.goto").attr("title", i18n.link_title);
 		context.find("a.ext").attr("title", i18n.ext_link_title);
-		context.find("td.ua").hover( UAHighlight, UAUnhighlight ).click( UAShow );
 	}
+
 	onUpdate( table );
+	$('#paths tbody').on( "click", "td.ua[title]", UAShow );
 });
 	

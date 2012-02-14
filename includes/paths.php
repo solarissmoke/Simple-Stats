@@ -47,10 +47,11 @@ function render_page() {
 			$browser_name = $ua->browser_name_from_id( $visit['browser'] );
 
 		$robot_class = ( $visit['browser'] == 1 ) ? ' bot' : '';
+		$title = $full_ua ? ' title="' . htmlspecialchars( $full_ua ) . '"' : '';
 		echo "<tr class='visit-header$robot_class'>";
 		echo '<td colspan="2" class="left">' . htmlspecialchars( $visit['remote_ip'] );
 		echo '<td>'.$dy_label.'</td>';
-		echo '<td class="ua" title="' . htmlspecialchars( $full_ua ) . '">' . htmlspecialchars( $browser_name ) . ' ' . htmlspecialchars( $visit['version'] );
+		echo "<td class='ua'$title>" . htmlspecialchars( $browser_name ) . ' ' . htmlspecialchars( $visit['version'] );
 		echo '<td>' . htmlspecialchars( $ua->platform_name_from_id( $visit['platform'] ) );
 		echo '<td>' . htmlspecialchars( country_name( $visit['country'] ) ) . '</tr>';
 

@@ -229,3 +229,7 @@ a.ajax, a.toggle{ cursor: pointer }
 #paths tr.hit td:first-child {
 	padding-left: 20px
 }
+
+#paths td.ua[title]:hover{
+	border-bottom: 1px dotted #CCC
+}
