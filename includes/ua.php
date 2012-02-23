@@ -70,7 +70,8 @@ class SimpleStatsUA {
 			9 => 'FreeBSD',
 			10 => 'i-mode',
 			11 => 'Nintendo Wii',
-			12 => 'PlayStation Portable'
+			12 => 'PlayStation Portable',
+			13 => 'Nokia'
 		);
 		
 		$this->platform_details = array(
