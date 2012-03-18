@@ -101,7 +101,7 @@ class SimpleStatsUA {
 		$default_version_regex = '/([\d\.]+)';
 		$result = array( 'browser' => 0, 'version' => '', 'platform' => 0 );
 		
-		$bots = array( 'crawl', 'bot', 'bloglines', 'dtaagent', 'feedfetcher', 'ia_archiver', 'java', 'larbin', 'mediapartners', 'metaspinner', 'searchmonkey', 'slurp', 'spider', 'teoma', 'ultraseek', 'waypath', 'yacy', 'yandex', 'scoutjet', 'harvester', 'facebookexternal', 'mail.ru/', 'urllib', 'validator', 'whatweb', 'bingpreview', 'gomezagent' );
+		$bots = array( 'crawl', 'bot', 'bloglines', 'dtaagent', 'feedfetcher', 'ia_archiver', 'java', 'larbin', 'mediapartners', 'metaspinner', 'searchmonkey', 'slurp', 'spider', 'teoma', 'ultraseek', 'waypath', 'yacy', 'yandex', 'scoutjet', 'harvester', 'facebookexternal', 'mail.ru/', 'urllib', 'validator', 'whatweb', 'bingpreview', 'gomezagent', 'nutch' );
 		
 		foreach( $bots as $str ) {
 			if( stripos( $_ua, $str ) !== false ) {
