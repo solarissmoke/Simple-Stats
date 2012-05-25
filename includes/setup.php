@@ -5,7 +5,7 @@ $options_tbl_fields = array(
 );
 
 $visits_tbl_fields = array(
-	'remote_ip'      => 'VARCHAR(15) NOT NULL DEFAULT ""',
+	'remote_ip'      => 'VARCHAR(39) NOT NULL DEFAULT ""',
 	'country'        => 'CHAR(2) NOT NULL DEFAULT ""',
 	'language'       => 'VARCHAR(255) NOT NULL DEFAULT ""',
 	'domain'         => 'VARCHAR(255) NOT NULL DEFAULT ""',

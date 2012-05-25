@@ -7,7 +7,7 @@ class SimpleStats {
 	public $options = array();
 	public $tz;
 	const version = '1.0.1';
-	const db_version = 4;
+	const db_version = 5;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -98,6 +98,10 @@ class SimpleStats {
 		if( $v && $v < 4 ) {
 			// bump referrer field size
 			$this->query( "ALTER TABLE `$visits_table` MODIFY `referrer` VARCHAR(512) NOT NULL DEFAULT ''" );
+		}
+		if( $v && $v < 5 ) {
+			// bump ip field size to allow ipv6 addresses
+			$this->query( "ALTER TABLE `$visits_table` MODIFY `remote_ip` VARCHAR(39) NOT NULL DEFAULT ''" );
 		}
 	}
 	
