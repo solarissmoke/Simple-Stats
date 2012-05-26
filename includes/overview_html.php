@@ -30,6 +30,9 @@ function display_filters(){
 		foreach( array( 'search_terms', 'domain', 'referrer' ) as $f )
 			filter_select( $f );
 	}
+	else {
+		echo '<p><small>' . __( 'Data for this month has been aggregated and cannot be filtered.' ) . '</small></p>';
+	}
 	
 	echo '<input class="hide-if-js" type="submit" value="' . __( 'Apply filters' ) . '">';
 
@@ -54,9 +57,6 @@ function display_content(){
 			}
 		echo '</div>';
 	}
-	
-	if( $is_archive )
-		echo '<p class="center">(' . __('aggregated') . ')</p>';
 
 	if ( !$ss->options['stats_enabled'] )
 		echo '<div id="disabled"><p class="center">' . __( 'Simple Stats is currently disabled.' ).'</p></div>';

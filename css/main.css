@@ -133,6 +133,8 @@ code {
 	border-bottom: 0
 }
 
+.calendar { min-width: 90% }
+
 .calendar td, .calendar th {
 	padding: 0;
 	font-size: 0.8em
