@@ -13,7 +13,7 @@ class SimpleStatsHit {
 			return;
 		
 		$data = array();
-		$data['remote_ip'] = substr( $this->determine_remote_ip(), 0, 15 );
+		$data['remote_ip'] = substr( $this->determine_remote_ip(), 0, 39 );
 		// check whether to ignore this hit
 		foreach ( $ss->options['ignored_ips'] as $ip ) {
 			if ( strpos( $data['remote_ip'], $ip ) === 0 )
