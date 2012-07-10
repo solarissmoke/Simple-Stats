@@ -49,7 +49,7 @@ function render_page() {
 	aggregate_old_data();
 	
 	// archives or current data?
-	if( intval( $filters['yr'] ) . intval( $filters['mo'] ) <= intval( $ss->options['last_aggregated'] ) )
+	if( intval( $filters['yr'] ) <= intval( substr( $ss->options['last_aggregated'], 0, 4 ) ) && intval( $filters['mo'] ) <= intval( substr( $ss->options['last_aggregated'], 4 ) ) )
 		$loaded_data = load_archive( $filters );
 	else
 		$loaded_data = load_data( $filters );
@@ -74,7 +74,7 @@ function aggregate_old_data(){
 		$mo += 12;
 	}
 	
-	if( isset( $ss->options['last_aggregated'] ) && $ss->options['last_aggregated'] && $yr . $mo >= intval( $ss->options['last_aggregated'] ) )
+	if( isset( $ss->options['last_aggregated'] ) && $ss->options['last_aggregated'] && $yr >= intval( substr( $ss->options['last_aggregated'], 0, 4 ) ) && $mo >= intval( substr( $ss->options['last_aggregated'], 4 ) ) )
 		return;		// we're already up to date
 	
 	$ss->update_option( 'last_aggregated', $yr . $mo );
