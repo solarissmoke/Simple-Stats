@@ -74,10 +74,7 @@ function display_content(){
 		table_total( 'remote_ip' );
 		table_percent( 'browser' );
 		table_percent( 'platform' );
-
-		if ( SimpleStats::is_geoip() )
-			table_percent( 'country' );
-		
+		table_percent( 'country' );
 		table_percent( 'language' );
 
 		echo '<h2>Referrers</h2>';
