@@ -182,7 +182,7 @@ class SimpleStats {
 	
 	static function determine_language() {
 		$lang_choice = '';
-		if ( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
+		if ( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
 			// Capture up to the first delimiter (comma found in Safari)
 			preg_match( "/([^,;]*)/", $_SERVER['HTTP_ACCEPT_LANGUAGE'], $langs );
 			$lang_choice = $langs[0];
@@ -191,18 +191,10 @@ class SimpleStats {
 	}
 	
 	static function parse_version( $_raw_version, $_parts = 2 ) {
-		$version_numbers = explode( '.', $_raw_version );
-		$value = '';
-
-		for ( $x = 0; $x < $_parts; $x++ ) {
-			if ( sizeof( $version_numbers ) > $x ) {
-				if ( $value != '' ) {
-					$value .= '.';
-				}
-				$value .= $version_numbers[$x];
-			}
-		}
-
+		$value = implode( '.', array_slice( explode( '.', $_raw_version ), 0, $_parts ) );
+		// skip trailing zeros - most browsers have rapid release cycles now
+		if( substr( $value, -2 ) == '.0' )
+			$value = substr_replace( $value, '', -2 );
 		return $value;
 	}
 	
