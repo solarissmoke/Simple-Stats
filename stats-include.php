@@ -19,32 +19,8 @@ class SimpleStatsHit {
 			if ( strpos( $data['remote_ip'], $ip ) === 0 )
 				return;
 		}
-		
-		$data['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
-		$url = parse_url( $data['referrer'] );
-		$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 511 );
-		
-		$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
-		$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );
-		$data['domain']   = isset( $url['host'] ) ? preg_replace( '/^www\./', '', $url['host'] ) : '';
-		$data['domain']   = substr( $data['domain'], 0, 255 );
-		
-		$data['search_terms'] = substr( $ss->utf8_encode( $this->determine_search_terms( $url ) ), 0, 255 );
 
-		if ( isset( $_SERVER['REQUEST_URI'] ) )
-			$data['resource'] = $_SERVER['REQUEST_URI'];
-		elseif ( isset( $_SERVER['SCRIPT_NAME'] ) && isset( $_SERVER['QUERY_STRING'] ) )
-			$data['resource'] = $_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING'];
-		elseif ( isset( $_SERVER['SCRIPT_NAME'] ) )
-			$data['resource'] = $_SERVER['SCRIPT_NAME'];
-		elseif ( isset( $_SERVER['PHP_SELF'] ) && isset( $_SERVER['QUERY_STRING'] ) )
-			$data['resource'] = $_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];
-		elseif ( isset( $_SERVER['PHP_SELF'] ) )
-			$data['resource'] = $_SERVER['PHP_SELF'];
-		else
-			$data['resource'] = '';
-
-		$data['resource'] = substr( $ss->utf8_encode( $data['resource'] ), 0, 255 );
+		$data['resource'] = substr( $ss->utf8_encode( $this->determine_resource() ), 0, 255 );
 		
 		$ua = new SimpleStatsUA();
 		$browser = $ua->parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
@@ -56,26 +32,11 @@ class SimpleStatsHit {
 		if ( $data['browser'] == 1 && $ss->options['log_bots'] == false )
 			return;
 		
-		$t = time();
-		
 		// use DateTime instead of messing with the default timezone which could affect the calling application
 		$tz = new DateTimeZone( $ss->options['tz'] );
 		$datetime = new DateTime( 'now', $tz );
-		
 		$date = $data['date'] = $datetime->format( 'Y-m-d' );
 		$time = $datetime->format( 'H:i:s' );
-		
-		// this isn't actually used at present, but storing local timestamps without a GMT reference is asking for trouble
-		$data['offset'] = $datetime->getOffset() / 60;	// store in minutes
-		
-		$domain_array = explode( '-', $data['domain'] );
-		if ( sizeof( $domain_array ) > 2 )
-			return;
-		
-		if ( strlen( $data['domain'] ) >= 25 &&
-		     ( !isset( $_SERVER['SERVER_NAME'] ) ||
-		       $data['domain'] != preg_replace( '/^www\./', '', $_SERVER['SERVER_NAME'] ) ) )
-			return;
 		
 		// attempt to update table
 		$table = $ss->tables['visits'];
@@ -101,6 +62,17 @@ class SimpleStatsHit {
 		$rows = $ss->query( $query );
 		
 		if ( $rows == 0 ) {
+			// this information is only needed for new visitors
+			$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
+			$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );
+			$data['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+			$url = parse_url( $data['referrer'] );
+			$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 511 );
+			$data['domain']   = isset( $url['host'] ) ? substr( preg_replace( '/^www\./', '', $url['host'] ), 0, 255 ) : '';
+			$data['search_terms'] = substr( $ss->utf8_encode( $this->determine_search_terms( $url ) ), 0, 255 );
+			// this isn't actually used at present, but storing local timestamps without a GMT reference is asking for trouble
+			$data['offset'] = $datetime->getOffset() / 60;	// store in minutes
+
 			$query = "INSERT INTO `$table` ( ";
 			foreach ( array_keys( $data ) as $key ) {
 				if ( $key == 'resource' ) 
@@ -147,7 +119,20 @@ class SimpleStatsHit {
 	}
 	
 	/**
-	 * Determines the visitor’s country based on their IP address.
+	 * Try to work out the requested resource.
+	 */
+	private function determine_resource() {
+		if( isset( $_SERVER['REQUEST_URI'] ) )
+			return $_SERVER['REQUEST_URI'];
+		elseif( isset( $_SERVER['SCRIPT_NAME'] ) )
+			return $_SERVER['SCRIPT_NAME'] . ( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?' . $_SERVER['QUERY_STRING'] );
+		elseif( isset( $_SERVER['PHP_SELF'] ) )
+			return $_SERVER['PHP_SELF'] . ( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?' . $_SERVER['QUERY_STRING'] );
+		return '';
+	}
+
+	/**
+	 * Determines the visitor's country based on their IP address.
 	 * You can supply your own GeoIP information (two-letter country code) by
 	 * definining a constant SIMPLE_STATS_GEOIP_COUNTRY containing this value.
 	 */
