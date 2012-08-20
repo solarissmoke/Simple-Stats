@@ -60,7 +60,7 @@ class SimpleStatsHit {
 		$query .= " AND TIMEDIFF( '$time', start_time ) < '00:30:00' LIMIT 1";
 		
 		$rows = $ss->query( $query );
-		
+
 		if ( $rows == 0 ) {
 			// this information is only needed for new visitors
 			$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
@@ -156,54 +156,38 @@ class SimpleStatsHit {
 	 * Detects referrals from search engines and tries to determine the search terms.
 	 */
 	private function determine_search_terms( $_url ) {
-		if ( !is_array( $_url ) )
-			$_url = parse_url( $_url );
-		
+		if( empty( $_url['host'] ) || empty( $_url['query'] ) )
+			return;
+
+		$sniffs = array( // host string, query portion containing search terms, parameterised url to decode
+			array( 'images.google', 'q', 'prev' ),
+			array( 'yahoo.', 'p' ),
+			array( 'yandex.', 'text' ),
+			array( 'rambler.', 'words' ),
+			// generic
+			array( '.', 'q' ),
+			array( '.', 'query' )
+		);
+
 		$search_terms = '';
-		
-		if ( isset( $_url['host'] ) && isset( $_url['query'] ) ) {
-			$sniffs = array( // host regexp, query portion containing search terms, parameterised url to decode
-				array( "/images\.google\./i", 'q', 'prev' ),
-				array( "/google\./i", 'q' ),
-				array( "/\.bing\./i", 'q' ),
-				array( "/alltheweb\./i", 'q' ),
-				array( "/yahoo\./i", 'p' ),
-				array( "/search\.aol\./i", 'query' ),
-				array( "/search\.cs\./i", 'query' ),
-				array( "/search\.netscape\./i", 'query' ),
-				array( "/hotbot\./i", 'query' ),
-				array( "/search\.msn\./i", 'q' ),
-				array( "/altavista\./i", 'q' ),
-				array( "/web\.ask\./i", 'q' ),
-				array( "/search\.wanadoo\./i", 'q' ),
-				array( "/www\.bbc\./i", 'q' ),
-				array( "/tesco\.net/i", 'q' ),
-				array( "/yandex\./i", 'text' ),
-				array( "/rambler\./i", 'words' ),
-				array( "/aport\./i", 'r' ),
-				array( "/.*/", 'query' ),
-				array( "/.*/", 'q' )
-			);
-			
-			foreach ( $sniffs as $sniff ) {
-				if ( preg_match( $sniff[0], $_url['host'] ) ) {
-					parse_str( $_url['query'], $q );
-					
-					if ( isset( $sniff[2] ) && isset( $q[$sniff[2]] ) ) {
-						$decoded_url = parse_url( $q[ $sniff[2] ] );
-						if ( isset( $decoded_url['query'] ) ) {
-							parse_str( $decoded_url['query'], $q );
-						}
-					}
-					
-					if ( isset( $q[ $sniff[1] ] ) ) {
-						$search_terms = trim( stripslashes( $q[ $sniff[1] ] ) );
-						break;
-					}
+
+		foreach ( $sniffs as $sniff ) {
+			if ( strpos( strtolower( $_url['host'] ), $sniff[0] ) !== false ) {
+				parse_str( $_url['query'], $q );
+
+				if ( isset( $sniff[2] ) && isset( $q[$sniff[2]] ) ) {
+					$decoded_url = parse_url( $q[ $sniff[2] ] );
+					if ( isset( $decoded_url['query'] ) )
+						parse_str( $decoded_url['query'], $q );
+				}
+
+				if ( isset( $q[ $sniff[1] ] ) ) {
+					$search_terms = trim( stripslashes( $q[ $sniff[1] ] ) );
+					break;
 				}
 			}
 		}
-		
+
 		return $search_terms;
 	}
 }
