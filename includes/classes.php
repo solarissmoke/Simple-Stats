@@ -179,25 +179,7 @@ class SimpleStats {
 
 		return iconv( $encoding, 'UTF-8', $_str );
 	}
-	
-	static function determine_language() {
-		$lang_choice = '';
-		if ( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
-			// Capture up to the first delimiter (comma found in Safari)
-			preg_match( "/([^,;]*)/", $_SERVER['HTTP_ACCEPT_LANGUAGE'], $langs );
-			$lang_choice = $langs[0];
-		}
-		return strtolower( $lang_choice );
-	}
-	
-	static function parse_version( $_raw_version, $_parts = 2 ) {
-		$value = implode( '.', array_slice( explode( '.', $_raw_version ), 0, $_parts ) );
-		// skip trailing zeros - most browsers have rapid release cycles now
-		if( substr( $value, -2 ) == '.0' )
-			$value = substr_replace( $value, '', -2 );
-		return $value;
-	}
-	
+
 	static function is_geoip() {
 		return ( file_exists( SIMPLE_STATS_PATH .'/geoip/geoip.php' ) && file_exists( SIMPLE_STATS_PATH.'/geoip/GeoIP.dat' ) );
 	}

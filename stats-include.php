@@ -26,7 +26,7 @@ class SimpleStatsHit {
 		$browser = $ua->parse_user_agent( $_SERVER['HTTP_USER_AGENT'] );
 		$data['platform'] = $browser['platform'];
 		$data['browser']  = $browser['browser'];
-		$data['version']  = substr( SimpleStats::parse_version( $browser['version'] ), 0, 15 );
+		$data['version']  = substr( $this->parse_version( $browser['version'] ), 0, 15 );
 		
 		// check whether to ignore this hit
 		if ( $data['browser'] == 1 && $ss->options['log_bots'] == false )
@@ -64,7 +64,7 @@ class SimpleStatsHit {
 		if ( $rows == 0 ) {
 			// this information is only needed for new visitors
 			$data['country']  = $this->determine_country( $data['remote_ip'] ); // always 2 chars, no need to truncate
-			$data['language'] = substr( SimpleStats::determine_language(), 0, 255 );
+			$data['language'] = substr( $this->determine_language(), 0, 255 );
 			$data['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
 			$url = parse_url( $data['referrer'] );
 			$data['referrer'] = substr( $ss->utf8_encode( $data['referrer'] ), 0, 511 );
@@ -151,6 +151,13 @@ class SimpleStatsHit {
 		
 		return '';
 	}
+
+	private function determine_language() {
+		// Capture up to the first delimiter (comma found in Safari)
+		if ( !empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) && preg_match( "/([^,;]*)/", $_SERVER['HTTP_ACCEPT_LANGUAGE'], $langs ) )
+			return strtolower( $langs[0] );
+		return '';
+	}
 	
 	/**
 	 * Detects referrals from search engines and tries to determine the search terms.
@@ -189,6 +196,14 @@ class SimpleStatsHit {
 		}
 
 		return $search_terms;
+	}
+
+	private function parse_version( $version, $parts = 2 ) {
+		$value = implode( '.', array_slice( explode( '.', $version ), 0, $parts ) );
+		// skip trailing zeros - most browsers have rapid release cycles now
+		if( substr( $value, -2 ) == '.0' )
+			$value = substr_replace( $value, '', -2 );
+		return $value;
 	}
 }
 
