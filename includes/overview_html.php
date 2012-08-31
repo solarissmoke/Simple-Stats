@@ -102,11 +102,13 @@ function filter_select( $id ) {
 		$data = &$loaded_data['visits'][$id];
 	
 	$data = (array) $data;
+	$single = count( $data ) <= 1;
 	
 	$active = isset( $filters[$id] );
 	$box = $active ? "<a class='clear-filter hide-if-no-js' data:filter='filter_$id'>&#215;</a> " : '';
 	$class = $active ? 'class="active-filter"' : '';
-	echo "<p $class>$box<select name='filter_$id' id='filter_$id'>";
+	$d = ( $single && !$active ) ? 'disabled' : '';
+	echo "<p $class>$box<select name='filter_$id' id='filter_$id' $d>";
 	echo "<option value='_' class='first'>— $title";
 	
 	if ( $active ) {
@@ -136,7 +138,8 @@ function filter_select( $id ) {
 		foreach ( array_keys( $data ) as $value ) {
 			$label = htmlspecialchars( get_value_label( $id, $value ) );
 			$value = htmlspecialchars( $value );
-			echo "<option value='$value'>$label";
+			$s = $single ? 'selected' : '';
+			echo "<option value='$value' $s>$label";
 			$x++;
 			if ( $x == 50 )
 				break;

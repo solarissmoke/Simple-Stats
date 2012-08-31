@@ -74,8 +74,7 @@ $(document).ready( function(){
 				var i = $(this), name = i.attr("name"), val = i.val();
 				if ( !name )
 					return;
-				
-				if ( val != "_" ) {
+				if ( val != "_" && !i.prop("disabled") ) {
 					qvs.push( name + '=' + encodeURIComponent( val ) );
 					if( i.is("select") )
 						i.parent().addClass("active-filter").prepend("<a class='clear-filter'>&#215;</a> ");
