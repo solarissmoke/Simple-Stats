@@ -181,6 +181,11 @@ function parse_data( $_result, $_fields, $_filters ) {
 		// extract individual page info
 		$resources = explode( "\n", $row['resource'] );
 
+		// if filtering by resource, things are a bit more complicated
+		$filtering_resource = isset( $_filters['resource'] );
+		$ignore_row = $filtering_resource;
+		$hits = $filtering_resource ? 0 : $row['hits'];
+
 		foreach( $resources as $r ) {
 			if( empty( $r ) )
 				continue;
@@ -189,8 +194,15 @@ function parse_data( $_result, $_fields, $_filters ) {
 			$resource = trim( $resource ); 
 			
 			// if filtering by page then ignore everything else but that page
-			if( isset( $_filters['resource'] ) && $resource != $_filters['resource'] )
-				continue;
+			if( $filtering_resource ) {
+				if( $resource == $_filters['resource'] ) {
+					$ignore_row = false;
+					$hits += 1;
+				}
+				else {
+					continue;
+				}
+			}
 
 			if( isset( $pages[$resource] ) )
 				$pages[$resource] ++;
@@ -198,6 +210,9 @@ function parse_data( $_result, $_fields, $_filters ) {
 				$pages[$resource] = 1;
 		}
 		
+		if( $ignore_row )
+			continue;
+
 		if ( isset( $row['search_terms'] ) && isset( $row['referrer'] ) ) {
 			if ( ! empty( $row['search_terms'] ) )
 				$source['search_terms']++;
@@ -220,9 +235,9 @@ function parse_data( $_result, $_fields, $_filters ) {
 			if( $field == 'date' || $field == 'start_time' ) {	// save both hits as well as visits
 				if ( isset( $visits[$field][$value] ) ) {
 					$visits[$field][$value]['visits'] ++;
-					$visits[$field][$value]['hits'] += $row['hits'];
+					$visits[$field][$value]['hits'] += $hits;
 				} else {
-					$visits[$field][$value] = array( 'hits' => $row['hits'], 'visits' => 1);
+					$visits[$field][$value] = array( 'hits' => $hits, 'visits' => 1 );
 				}
 			}
 			
