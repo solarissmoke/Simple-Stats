@@ -6,8 +6,8 @@ class SimpleStats {
 	public $tables = array();
 	public $options = array();
 	public $tz;
-	const version = '1.0.1';
-	const db_version = 5;
+	const version = '1.1';
+	const db_version = 6;
 	
 	function __construct() {
 		if( !defined( 'SIMPLE_STATS_DB_PREFIX' ) )
@@ -103,6 +103,11 @@ class SimpleStats {
 			// bump ip field size to allow ipv6 addresses
 			$this->query( "ALTER TABLE `$visits_table` MODIFY `remote_ip` VARCHAR(39) NOT NULL DEFAULT ''" );
 		}
+		if( $v && $v < 6 ) {
+			// change structure of last_aggregated - used to be yyyymm?, now array with keys yr and mo
+			$parts = $this->options['last_aggregated'] ? str_split( $this->options['last_aggregated'], 4 ) : array( 0, 0 );
+			$this->update_option( 'last_aggregated', array( 'yr' => intval( $parts[0] ), 'mo' => intval( $parts[1] ) ) );
+		}
 	}
 	
 	function setup_options() {
@@ -118,7 +123,7 @@ class SimpleStats {
 			'log_bots' => false,
 			'ignored_ips' => array(),
 			'aggregate_after' => 0,
-			'last_aggregated' => '0',
+			'last_aggregated' => array( 'yr' => 0, 'mo' => 0 ),
 			'salt' => sha1( rand() . date('Ymj') . 'simple-stats' . $_SERVER['SERVER_NAME'] ),
 			'db_version' => self::db_version
 		);

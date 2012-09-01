@@ -49,7 +49,7 @@ function render_page() {
 	aggregate_old_data();
 	
 	// archives or current data?
-	if( intval( $filters['yr'] ) <= intval( substr( $ss->options['last_aggregated'], 0, 4 ) ) && intval( $filters['mo'] ) <= intval( substr( $ss->options['last_aggregated'], 4 ) ) )
+	if( intval( $filters['yr'] ) <= $ss->options['last_aggregated']['yr'] && intval( $filters['mo'] ) <= $ss->options['last_aggregated']['mo'] )
 		$loaded_data = load_archive( $filters );
 	else
 		$loaded_data = load_data( $filters );
@@ -66,18 +66,18 @@ function aggregate_old_data(){
 		return;
 	
 	// start from the earliest month to aggregate
-	$yr = date('Y');
-	$mo = date('n') - $after - 1;
+	$yr = intval( date('Y') );
+	$mo = intval( date('n') ) - $after - 1;
 	
 	while( $mo < 1 ) {
 		$yr --;
 		$mo += 12;
 	}
-	
-	if( isset( $ss->options['last_aggregated'] ) && $ss->options['last_aggregated'] && $yr >= intval( substr( $ss->options['last_aggregated'], 0, 4 ) ) && $mo >= intval( substr( $ss->options['last_aggregated'], 4 ) ) )
+
+	if( $ss->options['last_aggregated']['yr'] >= $yr && $ss->options['last_aggregated']['mo'] >= $mo )
 		return;		// we're already up to date
-	
-	$ss->update_option( 'last_aggregated', $yr . $mo );
+
+	$ss->update_option( 'last_aggregated', array( 'yr' => $yr, 'mo' => $mo ) );
 	
 	$result = $ss->query( "SELECT MIN(`date`) FROM {$ss->tables['visits']} LIMIT 1" );
 	if( ! $result )
