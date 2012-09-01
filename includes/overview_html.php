@@ -17,7 +17,6 @@ function display_filters(){
 	echo '<div id="filters" class="center"><form>';
 	echo '<input type="hidden" id="filter_date" name="filter_date" value="' . get_date_filter( $filters['yr'], $filters['mo'], isset( $filters['dy'] ) ? $filters['dy'] : false ) . '">';
 
-		
 	if( !$is_archive ) {
 		echo '<h2>' . __( 'Content' ) . '</h2>';
 		filter_select( 'resource' );
@@ -102,13 +101,11 @@ function filter_select( $id ) {
 		$data = &$loaded_data['visits'][$id];
 	
 	$data = (array) $data;
-	$single = count( $data ) <= 1;
 	
 	$active = isset( $filters[$id] );
 	$box = $active ? "<a class='clear-filter hide-if-no-js' data:filter='filter_$id'>&#215;</a> " : '';
 	$class = $active ? 'class="active-filter"' : '';
-	$d = ( $single && !$active ) ? 'disabled' : '';
-	echo "<p $class>$box<select name='filter_$id' id='filter_$id' $d>";
+	echo "<p $class>$box<select name='filter_$id' id='filter_$id'>";
 	echo "<option value='_' class='first'>— $title";
 	
 	if ( $active ) {
@@ -138,8 +135,7 @@ function filter_select( $id ) {
 		foreach ( array_keys( $data ) as $value ) {
 			$label = htmlspecialchars( get_value_label( $id, $value ) );
 			$value = htmlspecialchars( $value );
-			$s = $single ? 'selected' : '';
-			echo "<option value='$value' $s>$label";
+			echo "<option value='$value'>$label";
 			$x++;
 			if ( $x == 50 )
 				break;
