@@ -183,7 +183,6 @@ function parse_data( $_result, $_fields, $_filters ) {
 
 		// if filtering by resource, things are a bit more complicated
 		$filtering_resource = isset( $_filters['resource'] );
-		$ignore_row = $filtering_resource;
 		$hits = $filtering_resource ? 0 : $row['hits'];
 
 		foreach( $resources as $r ) {
@@ -195,13 +194,10 @@ function parse_data( $_result, $_fields, $_filters ) {
 			
 			// if filtering by page then ignore everything else but that page
 			if( $filtering_resource ) {
-				if( $resource == $_filters['resource'] ) {
-					$ignore_row = false;
+				if( $resource == $_filters['resource'] )
 					$hits += 1;
-				}
-				else {
+				else
 					continue;
-				}
 			}
 
 			if( isset( $pages[$resource] ) )
@@ -209,9 +205,6 @@ function parse_data( $_result, $_fields, $_filters ) {
 			else
 				$pages[$resource] = 1;
 		}
-		
-		if( $ignore_row )
-			continue;
 
 		if ( isset( $row['search_terms'] ) && isset( $row['referrer'] ) ) {
 			if ( ! empty( $row['search_terms'] ) )
@@ -258,11 +251,10 @@ function parse_data( $_result, $_fields, $_filters ) {
 				continue;
 			}
 
-			if ( isset( $visits[$field][$value] ) ) {
+			if ( isset( $visits[$field][$value] ) )
 				$visits[$field][$value] ++;
-			} else {
+			else
 				$visits[$field][$value] = 1;
-			}
 		}
 	}
 
