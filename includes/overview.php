@@ -114,6 +114,8 @@ function aggregate_old_data(){
 			$mo += 12;
 		}
 	}
+
+	$ss->query( "OPTIMIZE TABLE `{$ss->tables['visits']}`" );
 }
 
 function load_archive( $_filters ) {
