@@ -15,10 +15,8 @@ class SimpleStatsHit {
 		$data = array();
 		$data['remote_ip'] = substr( $this->determine_remote_ip(), 0, 39 );
 		// check whether to ignore this hit
-		foreach ( $ss->options['ignored_ips'] as $ip ) {
-			if ( strpos( $data['remote_ip'], $ip ) === 0 )
-				return;
-		}
+		if( in_array( $data['remote_ip'], $ss->options['ignored_ips'] ) )
+			return;
 
 		$data['resource'] = substr( $ss->utf8_encode( $this->determine_resource() ), 0, 255 );
 		
@@ -98,10 +96,11 @@ class SimpleStatsHit {
 	
 	/**
 	 * Try to work out the original client IP address.
+	 * If all we end up with is a private IP, discard it.
 	 */
 	private function determine_remote_ip() {
 		// headers to look for, in order of priority
-		$headers_to_check = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED_HOST' );
+		$headers_to_check = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED_HOST', 'REMOTE_ADDR' );
 
 		foreach( $headers_to_check as $header ) {
 			if( empty( $_SERVER[$header] ) )
@@ -110,12 +109,12 @@ class SimpleStatsHit {
 			$ips = explode( ',', $_SERVER[$header] );
 			foreach( $ips as $ip ) {
 				$ip = trim( $ip );
-				if( $ip && ! preg_match( '/^(127\.|10\.|172\.1[0-6]\.|172\.2[0-0]\.|172\.3[0-1]\.|192\.168\.)/', $ip ) )	// we don't want private network IPs
+				if( $ip && ! preg_match( '/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/i', $ip ) )	// private network IPs
 					return $ip;
 			}
 		}
 		
-		return $_SERVER['REMOTE_ADDR'];
+		return '';
 	}
 	
 	/**

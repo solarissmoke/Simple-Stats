@@ -47,9 +47,10 @@ function render_page() {
 			
 		$ips = explode( "\n", str_replace( "\r\n", "\n", $_POST['ignored_ips'] ) );
 		$options['ignored_ips'] = array();
+		// we don't check the validity of IPs
 		foreach( $ips as $ip ) {
 			$ip = trim( $ip );
-			if( preg_match( '/^\d+\.\d+\.\d+\.\d+$/', $ip ) )
+			if( $ip )
 				$options['ignored_ips'][] = $ip;
 		}
 		
