@@ -86,7 +86,7 @@ $(document).ready( function(){
 		
 		// filters being removed
 		$(".clear-filter").click( function(){
-			$( "#" + $(this).attr("data:filter") ).val("_").change();
+			$( "#" + $(this).data("filter") ).val("_").change();
 		});
 		
 		// make the filter section pretty
@@ -133,9 +133,9 @@ $(document).ready( function(){
 			
 			$("#chartopt a").click( function(e){
 				e.preventDefault();
-				var type = $(this).attr("data:show");
+				var type = $(this).data("show");
 				chart = $.plot( $("#chart"), [ type == "h" ? data_hits : data_visits ], lineChartOptions );
-				$("#chart-title").text( $("#chart-data").attr("data:" + type + "title") );
+				$("#chart-title").text( $("#chart-data").data(type + "title") );
 				$("#chartopt a").removeClass("current");
 				$(this).addClass("current");
 			});

@@ -1,7 +1,7 @@
 $(document).ready( function(){
 	$(".hide-if-no-js").show();
 	var table = $("#paths");
-	var offset = parseInt( table.attr("data:offset") ), page_size = parseInt( table.attr("data:page_size") )
+	var offset = parseInt( table.data("offset") ), page_size = parseInt( table.data("page_size") )
 	var loading = false, lm = $("#load-more"), text = lm.text();
 	lm.click( function(e){ 
 		e.preventDefault();
@@ -25,9 +25,9 @@ $(document).ready( function(){
 	
 	function UAShow(){
 		var td = $(this);
-		if( !td.attr("data:ua-visible") ){
+		if( !td.data("uaVisible") ){
 			td.parent().after("<tr class='ua-row right'><td colspan='6'>" + td.attr("title") + "</tr>");
-			td.attr("data:ua-visible", "1");
+			td.data("uaVisible", "1");
 		}
 	}
 

@@ -52,7 +52,7 @@ function display_content(){
 		foreach( $field_names as $field => $name )
 			if( isset( $filters[$field] ) ) {
 				$label = htmlspecialchars( get_value_label( $field, $filters[$field]  ) );
-				echo "<span class='active-filter'><a class='clear-filter hide-if-no-js' data:filter='filter_$field'>&#215;</a> $name: <var>$label</var></span> ";
+				echo "<span class='active-filter'><a class='clear-filter hide-if-no-js' data-filter='filter_$field'>&#215;</a> $name: <var>$label</var></span> ";
 			}
 		echo '</div>';
 	}
@@ -103,7 +103,7 @@ function filter_select( $id ) {
 	$data = (array) $data;
 	
 	$active = isset( $filters[$id] );
-	$box = $active ? "<a class='clear-filter hide-if-no-js' data:filter='filter_$id'>&#215;</a> " : '';
+	$box = $active ? "<a class='clear-filter hide-if-no-js' data-filter='filter_$id'>&#215;</a> " : '';
 	$class = $active ? 'class="active-filter"' : '';
 	echo "<p $class>$box<select name='filter_$id' id='filter_$id'>";
 	echo "<option value='_' class='first'>— $title";
@@ -324,11 +324,11 @@ function chart( $what = 'days' ) {
 	echo '<div class="hide-if-no-js">';
 	echo '<h4 id="chart-title">' . $vtitle . '</h4>';
 	echo '<div class="wide" id="chart" style="height: 160px; border:none"></div>';
-	echo '<div id="chartopt"><small>' . __( 'Show:' ) . ' <a class="ajax" data:show="h">' . __( 'hits' ) . '</a> &middot; <a class="ajax current" data:show="v">' . __( 'visits' ) . '</a></small></div>';
+	echo '<div id="chartopt"><small>' . __( 'Show:' ) . ' <a class="ajax" data-show="h">' . __( 'hits' ) . '</a> &middot; <a class="ajax current" data-show="v">' . __( 'visits' ) . '</a></small></div>';
 	echo '</div>';
 	
 	// send the data as a hidden table which we'll parse using JS
-	echo "<table id='chart-data' style='display:none' data:vtitle='$vtitle' data:htitle='$htitle'>";
+	echo "<table id='chart-data' style='display:none' data-vtitle='$vtitle' data-htitle='$htitle'>";
 	foreach( $visits as $x => $y )
 		echo "<tr><th>$x<td>$y<td>{$hits[$x]}";
 	echo '</table>';
