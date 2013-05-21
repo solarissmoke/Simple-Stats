@@ -10,7 +10,7 @@ function render_page() {
 	$page_size = 20;
 	$offset = isset( $_GET['offset'] ) ?  abs( intval( $_GET['offset'] ) ) : 0;
 
-	$query = "SELECT * FROM `{$ss->tables['visits']}` ORDER BY `date` DESC LIMIT $offset,$page_size";
+	$query = "SELECT * FROM `{$ss->tables['visits']}` ORDER BY `date` DESC, `start_time` DESC LIMIT $offset,$page_size";
 
 	$visits = array();
 	if ( $result = $ss->query( $query ) ) {
