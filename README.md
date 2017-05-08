@@ -1,5 +1,7 @@
 # Simple Stats - PHP web statistics software
 
+**Warning: this project is no longer actively maintained. Use with caution!**
+
 Simple Stats is web statistics software written in PHP. It aims to be a simple and lightweight web statistics application that lets you analyse basic information about traffic on your website. It lets you track and filter the following:
 
 - Page views
@@ -10,7 +12,7 @@ Simple Stats is web statistics software written in PHP. It aims to be a simple a
 - Referrers
 - Search queries leading to your site 
 
-Simple Stats is not a fully-fledged analytics application — for that you might consider Piwik.
+Simple Stats is not a fully-fledged analytics application â€” for that you might consider Piwik.
 
 ## Installation
 
